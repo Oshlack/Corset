@@ -1,0 +1,108 @@
+#summary Installing and running Corset
+
+= Introduction =
+
+Add your content here.
+
+
+= Requirements =
+
+Corset requires samtools to be installed. Specifically it will use the library files and headers, so these must
+be in a place that can be accessed by Corset.
+
+We also suggest using gcc version 4.3 or greater because some newer container classes
+are available in c++0x. This is not a requirement however, code compiled with an older
+version of gcc will run slower.
+
+= Installation =
+
+To install, please down load the tar ball from here. Unzip and untar the source code.
+
+Run configure:
+{{{
+./configure
+}}}
+
+Note that you may have to specify the location of sam.h and libbam with
+{{{
+--with-bam_inc=<path_to_sam.h>
+}}} 
+and 
+{{{
+--with-bam_lib=<path_to_bam_library>
+}}}
+if they are not in the usual paths.
+
+Then run:
+{{{
+make
+make install
+}}}
+
+
+= Usage =
+
+In the simplest case, Corset can be run in the directory containing your bam files simply by typing:
+{{{
+corset *.bam
+}}}
+
+The inputs should be one bam files for each sample. The bam files should have been produced by multi-mapping the reads to the transcriptome. For example with bowtie/bowtie2 you should use the parameter --all (or -k with a large number).
+
+In general Corset can be run like:
+{{{
+corset [options] <input bam file1> <input bam file2> etc..
+}}}
+Where the options are:
+
+*-d* A comma seperated list of distance thresholds. The range must be between 0 and 1. e.g `-d 0.4,0.5,0.6` default: 0.3. A counts and cluster file will be produced for each distance threshold specified.
+
+*-D* The value used for thresholding the log likelihood ratio. The default value will depend on the number of degrees of freedom (which is 1 - the number of groups). By default D = 17.5 + 2.5 `*` ndf, which corresponds approximately to a p-value threshold of 10^-5, when there are fewer than 10 groups.
+
+*-m* Filter out any transcripts with fewer than this many reads aligning. Default: 10
+
+*-g* 	Specifies the grouping. ie. which samples belong to which experimental groups. The parameter must be a comma separated line (no spaces), with the groupings given in the same order as the sample filename. For example: `-g Group1,Group1,Group2,Group2` etc. If this option is not used, each sample is treated as an independent experimental group.
+
+*-p* 	Prefix for the output filenames. The output files will be of the form `<prefix>-counts.txt` and `<prefix>-clusters.txt`, default filenames are `counts.txt` and `clusters.txt`
+
+*-f* Specifies whether outputfile should be overwritten if they already exist. Maybe true or false, default: false
+
+*-n* Specifies the sample names to be used in the header of the output count files. This should be a comma seperated list without spaces. e.g. -n `Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA` etc. default: the input filenames will be used.
+
+
+= Output =
+
+By default corset will output two files: {{{ clusters.txt }}} and  {{{ counts.txt }}}. If you have specified multiple
+distance thresholds, then the output will be of the form {{{ clusters-<threshold>.txt }}} and  {{{ counts-<threshold>.txt }}}.
+
+{{{ clusters.txt }}} is a tab delimited table with one line for each transcript. The first column contains the transcripts and the second column is the cluster it has been assigned to.
+
+{{{ counts.txt }}} is also a tab delimited table. It lists the number of reads assigned to each cluster, one
+per row. The column list the count per sample.
+
+
+= Example pipeline =
+
+Here we provide a full example for going from RNA-Seq reads to gene-level differential expression results.
+
+... Oases yeast example? ....
+
+
+Download Reads
+---
+
+Trim the Reads
+---
+
+Perform a de novo assembly
+---
+
+Map read back to the transcriptome
+---
+
+Run corset
+---
+
+Run edgeR
+---
+
