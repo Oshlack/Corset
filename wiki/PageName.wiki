@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary Installing and running Corset
 
 = Introduction =
 
@@ -7,24 +7,47 @@ Add your content here.
 
 = Requirements =
 
-Corset requires samtools to be installed.
+Corset requires samtools to be installed. Specifically it will use the library files and headers, so these must
+be in a place that can be accessed by Corset.
+
+We also suggest using gcc version 4.3 or greater because some newer container classes
+are available in c++0x. This is not a requirement however, code compiled with an older
+version of gcc will run slower.
 
 = Installation =
 
 To install, please down load the tar ball from here. Unzip and untar the source code.
 
 Run configure:
-./config
+{{{
+./configure
+}}}
 
+Note that you may have to specify the location of sam.h and libbam with
+{{{
+--with-bam_inc=<path_to_sam.h>
+}}} 
+and 
+{{{
+--with-bam_lib=<path_to_bam_library>
+}}}
+if they are not in the usual paths.
 
+Then run:
+{{{
+make
+make install
+}}}
 
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
 
 = Usage =
+
+In the simplest case, Corset can be run simply by typing:
+{{{
+corset *.bam
+}}}
+In the directory containing your bam files
+
 
 Usage: corset [options] <input bam file1> <input bam file2> etc .....
 options are:
@@ -57,6 +80,14 @@ options are:
 	    	 This should be a comma seperated list without spaces.
 	    	 e.g. -n Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA etc.
 	    	 default: the input filenames will be used.
+
+
+In the simplest case, Corset can be run simply by typing:
+{{{
+corset *.bam
+}}
+In the directory containing the bam files
+
 
 
 = Output =
