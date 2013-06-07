@@ -49,7 +49,7 @@ corset *.bam
 
 The inputs should be one bam files for each sample. The bam files should have been produced by multi-mapping the reads to the transcriptome. For example with bowtie/bowtie2 you should use the parameter --all (or -k with a large number).
 
-In general Corset can be run like:
+In general, Corset can be run like so:
 {{{
 corset [options] <input bam file1> <input bam file2> etc..
 }}}
