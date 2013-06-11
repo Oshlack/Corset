@@ -1,6 +1,6 @@
 VERSION=0.9
-FILES=corset.cc Cluster.cc MakeClusters.cc MakeClusters.h Transcript.h Read.h StringSet.h Cluster.h
-OBJ=corset.o Cluster.o MakeClusters.o Transcript.cc
+FILES=corset.cc Cluster.cc Transcript.cc MakeClusters.cc MakeClusters.h Transcript.h Read.h StringSet.h Cluster.h 
+OBJ=corset.o Cluster.o MakeClusters.o Transcript.o
 
 corset: $(OBJ) Makefile
 	@CXX@ @CXXFLAGS@ $(OBJ) -o $@ @LDFLAGS@ @LIBS@
