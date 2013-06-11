@@ -1,0 +1,14 @@
+FILES=corset.cc Cluster.cc MakeClusters.cc MakeClusters.h Transcript.h Read.h StringSet.h Cluster.h
+OBJ=corset.o Cluster.o MakeClusters.o Transcript.cc
+
+corset: $(OBJ) Makefile
+	@CXX@ @CXXFLAGS@ $(OBJ) -o $@ @LDFLAGS@ @LIBS@
+
+%.o: %.cc
+	@CXX@ @CXXFLAGS@ -c $< -o $@
+
+clean:                                                     
+	-rm *~ *.o
+
+install: corset
+	cp corset @prefix@/bin
