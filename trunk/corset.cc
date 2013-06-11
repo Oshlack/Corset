@@ -112,7 +112,7 @@ void * read_bam_file(void * args){
 // combination of command line options.
 void print_usage(){
   cout << endl;
-  cout << "corset version 0.9" << endl;
+  cout << "corset version " << VERSION << endl;
   cout << endl;
   cout << "Usage: corset [options] <input bam files>" << endl;
   cout << endl;
