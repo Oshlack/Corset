@@ -1,0 +1,34 @@
+Requirements
+------------
+Corset requires samtools to be installed. Specifically it will use the 
+library files and headers, so these must be in a place that can be 
+accessed by Corset.
+
+We also suggest using gcc version 4.3 or greater because some newer 
+container classes are available in c++0x. This is not a requirement 
+however, code compiled with an older version of gcc will run slower.
+
+
+Installation
+------------
+Compile and install in the usual way with:
+
+./configure
+make
+make install
+
+Note that when running configure you may need to specify the 
+locations of sam.h and libbam with: 
+--with-bam_inc=<path_to_sam.h> and --with-bam_lib=<path_to_bam_library>
+
+
+Running
+-------
+Type "corset" to get usage information.
+
+More help can be found on the website at:
+https://code.google.com/p/corset-project/
+
+
+----
+Last Modified, N. Davidson, 11 June 2013

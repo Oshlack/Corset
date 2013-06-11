@@ -1,0 +1,71 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_INIT([corset], [0.9], [<nadia.davidson@mcri.edu.au>])
+
+# Checks for programs.
+#AC_PROG_CC
+CXXFLAGS="-O3 -ffast-math -I./ $CXXFLAGS $CPPFLAGS"
+
+AC_PROG_CXX()
+AC_LANG(C++)
+AC_PROG_MAKE_SET
+
+AC_ARG_WITH(bam-lib, [  --with-bam_lib
+                  specify the directory where the samtools libraries can be found])
+AC_ARG_WITH(bam-inc, [  --with-bam_inc
+                  specify the directory where the samtools headers can be found])
+
+if test "$with_bam_lib" != ""
+then
+        LDFLAGS="-L$with_bam_lib $LDFLAGS"
+        LD_RUN_PATH="$LD_RUN_PATH:$with_bam_lib"
+fi
+
+if test "$with_bam_inc" != ""
+then
+        CXXFLAGS="-I$with_bam_inc $CXXFLAGS"
+fi
+
+#Checks for samtools libraries and header files
+AC_CHECK_HEADER([sam.h], [], [
+  echo "" &&
+  echo "ERROR: Could not find the samtools headers." &&
+  echo "       Please specify the location with: " &&
+  echo "       './configure --with-bam_inc=<path_to_sam.h> " &&
+  exit -1
+])
+
+AC_CHECK_LIB([bam], [main], [], [
+  echo "" &&
+  echo "ERROR: Could not find the samtools library, libbam." &&
+  echo "       Please specify the location with: " &&
+  echo "       './configure --with-bam_lib=<path_to_bam_library> " &&
+  exit -1
+])
+
+AC_CHECK_LIB([z], [main], [], [
+  echo "" &&
+  echo "ERROR: Could not find the samtools library, libbam." &&
+  echo "       Please specify the location with: " &&
+  echo "       './configure --with-bam_lib=<path_to_bam_library> " &&
+  exit -1
+])
+
+AC_CHECK_LIB([pthread], [main], [], [])
+
+AC_CONFIG_FILES([Makefile])
+
+my_save_cflags="$CXXFLAGS"
+CXXFLAGS=-std=c++0x
+AC_MSG_CHECKING([whether compiler supports -std=c++0x])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],[
+	my_save_cflags="$my_save_cflags -std=c++0x -DUNORDEREDMAP"],
+	[AC_MSG_RESULT([no])]
+)
+CXXFLAGS="$my_save_cflags"
+
+AC_SUBST(LD_RUN_PATH,$LD_RUN_PATH)
+#AC_SUBST(BASE,$PWD)
+
+AC_OUTPUT
