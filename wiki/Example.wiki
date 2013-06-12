@@ -25,8 +25,8 @@ perl <path to condetri>/condetri_v2.2.pl -sc=33 -fastq1=SRR453566_1.fastq -fastq
 In this example we will use [http://trinityrnaseq.sourceforge.net/ Trinity] to assemble the transcripts. You will have more power to detect transcripts if all the samples are pooled, therefore the first step is to concatenate the fastq files together:
 
 {{{
-cat *_trim1.fastq >> all_1.fastq
-cat *_trim2.fastq >> all_2.fastq
+cat *_trim1.fastq > all_1.fastq
+cat *_trim2.fastq > all_2.fastq
 }}}
 
 now run Trinity:
