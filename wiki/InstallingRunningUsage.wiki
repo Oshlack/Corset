@@ -11,7 +11,7 @@ versions of gcc will run slower.
 
 = Installation =
 
-To install, please down load the tar ball from [https://docs.google.com/file/d/0B1FwZagazjpcS3dkSEgwV3dVa1U/ here]. Unzip and untar the source code.
+To install, please down load the tar ball from [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.9.tar.gz here]. Unzip and untar the source code.
 
 Run configure:
 {{{
