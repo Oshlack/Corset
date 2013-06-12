@@ -6,12 +6,12 @@
 Corset requires [http://samtools.sourceforge.net/ samtools] to be installed. It will use the library and headers files, so these must be in a place that can be accessed by Corset.
 
 We also suggest using gcc version 4.3 or greater because some newer container classes
-are available in c++0x. This is not a requirement however, code compiled with an older
-version of gcc will run slower.
+are available in c++0x. This is not a requirement but code compiled with older
+versions of gcc will run slower.
 
 = Installation =
 
-To install, please down load the tar ball from here. Unzip and untar the source code.
+To install, please down load the tar ball from [https://docs.google.com/file/d/0B1FwZagazjpcS3dkSEgwV3dVa1U/ here]. Unzip and untar the source code.
 
 Run configure:
 {{{
@@ -101,12 +101,12 @@ options are:
 
 = Output =
 
-By default corset will output two files: {{{ clusters.txt }}} and  {{{ counts.txt }}}. If you have specified multiple
-distance thresholds, then the output will be of the form {{{ clusters-<threshold>.txt }}} and  {{{ counts-<threshold>.txt }}}.
+By default corset will output two files: {{{clusters.txt}}} and  {{{counts.txt}}}. If you have specified multiple
+distance thresholds, then the output will be of the form {{{clusters-<threshold>.txt}}} and  {{{counts-<threshold>.txt}}}.
 
-{{{ clusters.txt }}} is a tab delimited table with one line for each transcript. The first column contains the transcripts and the second column is the cluster it has been assigned to.
+{{{clusters.txt}}} is a tab delimited table with one line for each transcript. The first column contains the transcript ids and the second column is the cluster id it has been assigned to.
 
-{{{ counts.txt }}} is also a tab delimited table. It lists the number of reads assigned to each cluster, one
-per row. The column list the count per sample.
+{{{counts.txt}}} is also a tab delimited table. It lists the number of reads assigned to each cluster, one
+per row. There is one columns for each sample.
 
 The cluster naming is of the form {{{Clusters-X.Y}}}. The {{{X}}} is the _super-cluster_ ID. Any transcript which shares even a single read with another transcript will have the same _super-cluster_ ID. The {{{Y}}} indicates the cluster number within the _super-cluster_ (ie. those which resulted from the hierarchical clustering and expression testing. If you run Corset with the option {{{-m 0}}} (no filtering on the number of reads), you might also find clusters with the prefix "NoReadsCluster". These clusters have no reads which map to them, and are therefore excluded from the counts file.
