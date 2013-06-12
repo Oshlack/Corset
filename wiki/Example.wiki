@@ -31,35 +31,40 @@ cat *_trim2.fastq >> all_2.fastq
 
 now run Trinity:
 {{{
-Trinity.pl --seqType fq --left all_1.fastq --right all_2.fastq
+<path to Trinity>/Trinity.pl --seqType fq --left all_1.fastq --right all_2.fastq
 }}}
 
 Note a couple of tricks in getting Trinity to work:
    * I have alway needed to set {{{ulimit -s unlimited}}}
-   * I have often needed to increase the memory used by jellyfish. e.g. {{--JM 100G}}}
+   * I have often needed to increase the memory used by jellyfish. e.g. {{{--JM 100G}}}
    * I like to use the {{{--full_cleanup}}} option so I don't get hundres of big files left over.
 
 The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
 
 ==Map reads back to the transcriptome==
 
-Now we need to multi-map the reads back to the transcriptome. In this
-example I will use [http://bowtie-bio.sourceforge.net/index.shtml bowtie]. The bowtie option --all means that all alignments are reported. If you have a large dataset, you might like to limit the number of reported
-alignment to a large (but finite) number, as this will be faster and the
-resulting bam files will be smaller. In bowtie you could do this with -k 40 (40 reported
-alignments)
+Now we need to multi-map the reads back to the transcriptome. In this example I will use [http://bowtie-bio.sourceforge.net/index.shtml bowtie]. The bowtie option {{{--all}}} means that all alignments are reported. If you have a large dataset, you might like to limit the number of reported
+alignment to a large (but finite) number, as this will be faster and the resulting bam files will be smaller. In bowtie you could do this with {{{-k 40}} (40 reported alignments). 
+
+In the paper, and this example, we map the reads back as pair-end, meaning that if only one read end maps to a transcript and not both, neither is reported. There may be some disadvantages in this, but we have not experimented with it. Feel free to try different mapping options, such as single-end and let us know if it makes a difference!
 
 Build the bowtie index:
 {{{
 bowtie-build Trinity.fasta Trinity
 }}}
 
-Map each file:
+Map each file to the transcriptome. Here is a short bash script for doing that:
 {{{
-bowtie --all -S ... -1 ${1} -2 ${2} > ${3}.sam 
-sam2bam ${3}.sam...
-
+FILES=`ls SRR*_1.fastq_trim1.fastq | sed 's/_1.fastq_trim1.fastq//g'`
+for F in $FILES ; do
+        R1=${FQ_DIR}/${F}_1.fastq_trim1.fastq
+        R2=`echo $R1 | sed 's/trim1/trim2/g'`
+        bowtie --all -S Trinity -1 $R1 -2 $R2 > ${3}.sam  
+        samtools view -S -b $3 > $1.bam
+done
 }}}
+
+You might want to delete the .sam files at this point if they are taking up too much space
 
 ==Run corset==
 
