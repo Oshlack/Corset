@@ -3,8 +3,7 @@
 
 = Requirements =
 
-Corset requires samtools to be installed. Specifically it will use the library files and headers, so these must
-be in a place that can be accessed by Corset.
+Corset requires [http://samtools.sourceforge.net/ samtools] to be installed. It will use the library and headers files, so these must be in a place that can be accessed by Corset.
 
 We also suggest using gcc version 4.3 or greater because some newer container classes
 are available in c++0x. This is not a requirement however, code compiled with an older
@@ -45,25 +44,59 @@ corset *.bam
 
 The inputs should be one bam files for each sample. The bam files should have been produced by multi-mapping the reads to the transcriptome. For example with bowtie/bowtie2 you should use the parameter --all (or -k with a large number).
 
-In general, Corset can be run like so:
+The usage information provided by corset is:
 {{{
-corset [options] <input bam file1> <input bam file2> etc..
+corset version 0.9
+
+Usage: corset [options] <input bam files>
+
+input bam files:
+	 The input files should be multi-mapped bam files. They can be single, paired-end or mixed
+	 and do not need to be indexed. A space separated list should be given.
+	 e.g. corset sample1.bam sample2.bam sample3.bam
+	 or just: corset sample*.bam
+
+	 If you want to combine the results from different transcriptomes. i.e. the same reads have
+	 been mapped twice or more, you can used a comma separated list like below:
+	 corset sample1_Trinity.bam,sample1_Oases.bam sample2_Trinity.bam,sample2_Oases.bam ...
+
+options are:
+
+	 -d <double list> A comma separated list of distance thresholds. The range must be
+	                  between 0 and 1. e.g -d 0.4,0.5. If more than one distance threshold
+	                  is supplied, the output filenames will be of the form:
+	                  counts-<threshold>.txt and clusters-<threshold>.txt
+	                  Default: 0.3
+
+	 -D <double>      The value used for thresholding the log likelihood ratio. The default
+	                  value will depend on the number of degrees of freedom (which is 1 - the
+	                  number of groups). By default D = 17.5 + 2.5 * ndf, which corresponds
+	                  approximately to a p-value threshold of 10^-5, when there are fewer than
+	                  10 groups.
+
+	 -m <int>         Filter out any transcripts with fewer than this many reads aligning.
+	                  Default: 10
+
+	 -g <list>        Specifies the grouping. i.e. which samples belong to which experimental
+	                  groups. The parameter must be a comma separated list (no spaces), with the
+	                  groupings given in the same order as the bam filename. For example:
+	                  -g Group1,Group1,Group2,Group2 etc. If this option is not used, each sample
+	                  is treated as an independent experimental group.
+
+	 -p <string>      Prefix for the output filenames. The output files will be of the form
+	                  <prefix>-counts.txt and <prefix>-clusters.txt. Default filenames are:
+	                  counts.txt and clusters.txt
+
+	 -f <true/false>  Specifies whether the outputfiles should be overwritten if they already exist.
+	                  Default: false
+
+	 -n <string list> Specifies the sample names to be used in the header of the output count file.
+	                  This should be a comma separated list without spaces.
+	                  e.g. -n Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA etc.
+	                  Default: the input filenames will be used.
 }}}
-Where the options are:
 
-*-d* A comma seperated list of distance thresholds. The range must be between 0 and 1. e.g `-d 0.4,0.5,0.6` default: 0.3. A counts and cluster file will be produced for each distance threshold specified.
 
-*-D* The value used for thresholding the log likelihood ratio. The default value will depend on the number of degrees of freedom (which is 1 - the number of groups). By default D = 17.5 + 2.5 `*` ndf, which corresponds approximately to a p-value threshold of 10^-5, when there are fewer than 10 groups.
-
-*-m* Filter out any transcripts with fewer than this many reads aligning. Default: 10
-
-*-g* 	Specifies the grouping. ie. which samples belong to which experimental groups. The parameter must be a comma separated line (no spaces), with the groupings given in the same order as the sample filename. For example: `-g Group1,Group1,Group2,Group2` etc. If this option is not used, each sample is treated as an independent experimental group.
-
-*-p* 	Prefix for the output filenames. The output files will be of the form `<prefix>-counts.txt` and `<prefix>-clusters.txt`, default filenames are `counts.txt` and `clusters.txt`
-
-*-f* Specifies whether outputfile should be overwritten if they already exist. Maybe true or false, default: false
-
-*-n* Specifies the sample names to be used in the header of the output count files. This should be a comma seperated list without spaces. e.g. -n `Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA` etc. default: the input filenames will be used.
 
 
 = Output =
