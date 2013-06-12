@@ -42,7 +42,6 @@ Note a couple of tricks in getting Trinity to work:
    * I like to use the {{{--full_cleanup}}} option so I don't get hundres of big files left over.
    * Speed up the assembly by running in parallell. e.g. {{{--CPU 16}}}. However sometimes when you do this, you'll find that the job fails at the end because too many processes want memory. If this happens rerun Trinity with a smaller number of CPUs. It should restart where it stopped.
 
-The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
 
 ==Map reads back to the transcriptome==
 
