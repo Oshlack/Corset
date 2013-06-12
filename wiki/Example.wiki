@@ -1,0 +1,34 @@
+#summary A full example demonstrating how to perform differential gene expression analysis on a RNA-Seq reads
+#labels Featured
+
+= Example pipeline =
+
+Here we provide a full example for going from RNA-Seq reads to gene-level differential expression results.
+I'm going to use the yeast example running Trinity from our paper because it's small enough to run quickly,
+but you can replace the file names with whatever data you have.
+
+You can download the yeast data from [http://sra.dnanexus.com/runs/SRR453566 here]. You will need to download files SRR453566 to SRR453571. Sra provides tools to covert from sra to other formats [http://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software here]. Use:
+{{{
+fastq-dump --split-3 SRR453566.sra
+}}}
+on each file to get paired-end fastq files.
+
+Trim the Reads
+---
+It's worth while to clean the reads a little before running the de novo assembler. I like
+to use [https://code.google.com/p/condetri/ condetri] because it can handle paired-end reads well.
+{{{
+perl <path to condetri>/condetri_v2.2.pl -sc=33 -fastq1=SRR453566_1.fastq -fastq2=SRR453566_2.fastq
+}}}
+
+Perform the de novo assembly
+---
+
+Map read back to the transcriptome
+---
+
+Run corset
+---
+
+Run edgeR
+---
