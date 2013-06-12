@@ -23,21 +23,24 @@ perl <path to condetri>/condetri_v2.2.pl -sc=33 -fastq1=SRR453566_1.fastq -fastq
 ==Perform the de novo assembly==
 
 In this example we will use [http://trinityrnaseq.sourceforge.net/ Trinity] to assemble the transcripts. You will have more power to detect transcripts if all the samples are pooled, therefore the first step is to concatenate the fastq files together:
-
 {{{
 cat *_trim1.fastq > all_1.fastq
 cat *_trim2.fastq > all_2.fastq
 }}}
+I ignore the unpaired reads. Hopefully there aren't too many of them.
 
 now run Trinity:
 {{{
 <path to Trinity>/Trinity.pl --seqType fq --left all_1.fastq --right all_2.fastq
 }}}
 
+The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
+
 Note a couple of tricks in getting Trinity to work:
    * I have alway needed to set {{{ulimit -s unlimited}}}
    * I have often needed to increase the memory used by jellyfish. e.g. {{{--JM 100G}}}
    * I like to use the {{{--full_cleanup}}} option so I don't get hundres of big files left over.
+   * Speed up the assembly by running in parallell. e.g. {{{--CPU 16}}}. However sometimes when you do this, you'll find that the job fails at the end because too many processes want memory. If this happens rerun Trinity with a smaller number of CPUs. It should restart where it stopped.
 
 The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
 
@@ -55,12 +58,12 @@ bowtie-build Trinity.fasta Trinity
 
 Map each file to the transcriptome. Here is a short bash script for doing that:
 {{{
-FILES=`ls SRR*_1.fastq_trim1.fastq | sed 's/_1.fastq_trim1.fastq//g'`
+FILES=`ls SRR*_1_trim1.fastq | sed 's/_1_trim1.fastq//g'`
 for F in $FILES ; do
-        R1=${FQ_DIR}/${F}_1.fastq_trim1.fastq
-        R2=`echo $R1 | sed 's/trim1/trim2/g'`
-        bowtie --all -S Trinity -1 $R1 -2 $R2 > ${3}.sam  
-        samtools view -S -b $3 > $1.bam
+        R1= ${F}_1.fastq_trim1.fastq
+        R2= ${F}_1.fastq_trim2.fastq
+        bowtie --all -S Trinity -1 $R1 -2 $R2 > ${F}.sam  
+        samtools view -S -b ${F}.sam > ${F}.bam
 done
 }}}
 
