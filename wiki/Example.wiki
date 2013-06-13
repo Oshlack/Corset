@@ -15,17 +15,18 @@ on each file to get paired-end fastq files.
 
 ==Prepare the reads==
 It's worth while cleaning the reads before running the de novo assembler. I like
-to use [https://code.google.com/p/condetri/ condetri] to trim off any read ends which have low quality scored. It can handle paired-end reads well.
+to use [http://www.usadellab.org/cms/index.php?page=trimmomatic trimmomatic] to trim off any ends which have low quality scored. It's fast and can handle paired-end reads well.
 {{{
-perl <path to condetri>/condetri_v2.2.pl -sc=33 -fastq1=SRR453566_1.fastq -fastq2=SRR453566_2.fastq
+trimmomatic -phred33 SRR453566_1.fastq SRR453566_2.fastq SRR453566_P1.fastq SRR453566_U1.fastq SRR453566_P2.fastq SRR453566_U2.fastq LEADING:20 TRAILING:20 MINLEN:50
 }}}
+P here means paired and U means unpaired. We will ignore the unpaired reads for the reminder of this tutorial.
 
 ==Perform the de novo assembly==
 
 In this example we will use [http://trinityrnaseq.sourceforge.net/ Trinity] to assemble the transcripts. You will have more power to detect transcripts if all the samples are pooled, therefore the first step is to concatenate the fastq files together:
 {{{
-cat *_trim1.fastq > all_1.fastq
-cat *_trim2.fastq > all_2.fastq
+cat *_P1.fastq > all_1.fastq
+cat *_P2.fastq > all_2.fastq
 }}}
 I ignore the unpaired reads. Hopefully there aren't too many of them.
 
@@ -57,10 +58,10 @@ bowtie-build Trinity.fasta Trinity
 
 Map each file to the transcriptome. Here is a short bash script for doing that:
 {{{
-FILES=`ls SRR*_1_trim1.fastq | sed 's/_1_trim1.fastq//g'`
+FILES=`ls SRR*_P1.fastq | sed 's/_P1.fastq//g'`
 for F in $FILES ; do
-        R1= ${F}_1.fastq_trim1.fastq
-        R2= ${F}_1.fastq_trim2.fastq
+        R1= ${F}_P1.fastq
+        R2= ${F}_P2.fastq
         bowtie --all -S Trinity -1 $R1 -2 $R2 > ${F}.sam  
         samtools view -S -b ${F}.sam > ${F}.bam
 done
