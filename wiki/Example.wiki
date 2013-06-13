@@ -25,10 +25,16 @@ P here means paired and U means unpaired. We will ignore the unpaired reads for 
 
 In this example we will use [http://trinityrnaseq.sourceforge.net/ Trinity] to assemble the transcripts. You will have more power to detect transcripts if all the samples are pooled, therefore the first step is to concatenate the fastq files together:
 {{{
-cat *_P1.fastq > all_1.fastq
-cat *_P2.fastq > all_2.fastq
+cat *_P1.fastq | sed 's/ HWI/\/1 HWI/g' > all_1.fastq
+cat *_P2.fastq | sed 's/ HWI/\/2 HWI/g' > all_2.fastq
 }}}
-I ignore the unpaired reads. Hopefully there aren't too many of them.
+The middle part of this code fixes the read IDs for Trinity by adding a \1 to the end of
+the first end's name and a \2 to the end of the 2nd ends name. This is a hack that
+I discovered is necessary for running Trinity on SRA data. Without fixing the read IDs,
+Trinity it will loose the paired-end information. For illumina Hi-Seq reads, I've found that
+Trinity works fine without doing this. You can check that the reads are being iterpreted correctly
+by looking at read IDs in the both.fa file the Trinity creates. If something has gone wrong you'll 
+see an ID like ">SRR453566.19/H". Where the "H" should clearly be a "1" or "2".
 
 now run Trinity:
 {{{
