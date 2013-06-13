@@ -32,7 +32,7 @@ I ignore the unpaired reads. Hopefully there aren't too many of them.
 
 now run Trinity:
 {{{
-<path to Trinity>/Trinity.pl --seqType fq --left all_1.fastq --right all_2.fastq
+<path to Trinity>/Trinity.pl --JM 10G --seqType fq --left all_1.fastq --right all_2.fastq
 }}}
 
 The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
