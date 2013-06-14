@@ -32,8 +32,8 @@ The middle part of this code fixes the read IDs for Trinity by adding a \1 to th
 the first end's name and a \2 to the end of the 2nd ends name. This is a hack that
 I discovered is necessary for running Trinity on SRA data. Without fixing the read IDs,
 Trinity will loose the paired-end information. For Illumina Hi-Seq reads, I've found that
-Trinity works fine without doing this. You can check that the reads are being iterpreted correctly
-by looking at read IDs in the both.fa file the Trinity creates. If something has gone wrong you'll 
+Trinity works fine without doing this. You can check that the reads-ends are being interpreted correctly
+by looking at read IDs in the {{{both.fa}}} file the Trinity creates. If something has gone wrong you'll 
 see an ID like ">SRR453566.19/H". Where the "H" should clearly be a "1" or "2".
 
 now run Trinity:
