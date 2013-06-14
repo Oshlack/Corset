@@ -72,6 +72,7 @@ for F in $FILES ; do
         samtools view -S -b ${F}.sam > ${F}.bam
 done
 }}}
+Speed this up by running bowtie with multiple threads eg. using the flag {{{-p 16}}}
 
 You might want to delete the .sam files at this point if they take up too much space
 
