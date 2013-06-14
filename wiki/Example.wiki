@@ -66,14 +66,14 @@ Map each file to the transcriptome. Here is a short bash script for doing that:
 {{{
 FILES=`ls SRR*_P1.fastq | sed 's/_P1.fastq//g'`
 for F in $FILES ; do
-        R1= ${F}_P1.fastq
-        R2= ${F}_P2.fastq
+        R1=${F}_P1.fastq
+        R2=${F}_P2.fastq
         bowtie --all -S Trinity -1 $R1 -2 $R2 > ${F}.sam  
         samtools view -S -b ${F}.sam > ${F}.bam
 done
 }}}
 
-You might want to delete the .sam files at this point if they are taking up too much space
+You might want to delete the .sam files at this point if they take up too much space
 
 ==Run corset==
 
