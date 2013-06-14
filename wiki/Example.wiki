@@ -87,7 +87,7 @@ corset -g 1,1,1,2,2,2 -n A1,A2,A3,B1,B2,B3 *.bam
 ==Run edgeR==
 
 [http://www.bioconductor.org/packages/release/bioc/html/edgeR.html egdeR] is a bioconductor package in R which will be used to test the count data for significant differential expression. The snippet of
-code below shows how you can get a list of the top differentially expressed clusters in R.
+code below shows how you can get a list of the top differentially expressed clusters.
 
 {{{
 library(edgeR)
@@ -103,3 +103,6 @@ dge<-estimateTagwiseDisp(dge)
 results<-exactTest(dge)
 topTags(results)
 }}}
+
+
+Clusters of interest can then be examined further and annotated. For example by selecting a representative transcript from each cluster and using software such as [http://www.blast2go.com/b2ghome blast2GO] to work out what the gene is.
