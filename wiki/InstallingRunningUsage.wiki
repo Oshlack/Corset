@@ -20,13 +20,14 @@ Run configure:
 
 Note that you may have to specify the location of sam.h and libbam with
 {{{
---with-bam_inc=<path_to_sam.h>
+--with-bam_inc=<absolute_path_to_sam.h>
 }}} 
 and 
 {{{
---with-bam_lib=<path_to_bam_library>
+--with-bam_lib=<absolute_path_to_bam_library>
 }}}
-if they are not in the usual paths.
+if they are not in the usual paths. Note that you need to give the absolute path
+and not a relative path.
 
 Then run:
 {{{
