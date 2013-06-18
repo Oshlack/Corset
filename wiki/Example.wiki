@@ -17,7 +17,7 @@ on each file to get paired-end fastq files.
 It's worth while cleaning the reads before running the de novo assembler. I like
 to use [http://www.usadellab.org/cms/index.php?page=trimmomatic trimmomatic] to trim off any ends which have low quality scored. It's fast and can handle paired-end reads well.
 {{{
-trimmomatic -phred33 SRR453566_1.fastq SRR453566_2.fastq SRR453566_P1.fastq SRR453566_U1.fastq SRR453566_P2.fastq SRR453566_U2.fastq LEADING:20 TRAILING:20 MINLEN:50
+trimmomatic PE -phred33 SRR453566_1.fastq SRR453566_2.fastq SRR453566_P1.fastq SRR453566_U1.fastq SRR453566_P2.fastq SRR453566_U2.fastq LEADING:20 TRAILING:20 MINLEN:50
 }}}
 P here means paired and U means unpaired. We will ignore the unpaired reads for the reminder of this tutorial.
 
