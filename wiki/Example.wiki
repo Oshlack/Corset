@@ -41,7 +41,7 @@ now run Trinity:
 <path to Trinity>/Trinity.pl --JM 10G --seqType fq --left all_1.fastq --right all_2.fastq
 }}}
 
-The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
+Note that this might take several hours to run. The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
 
 Note a couple of tricks in getting Trinity to work:
    * I have alway needed to set {{{ulimit -s unlimited}}}
