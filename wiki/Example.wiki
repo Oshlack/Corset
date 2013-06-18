@@ -43,7 +43,7 @@ now run Trinity:
 
 Note that this might take several hours to run. The result should be a fasta file of transcripts called {{{Trinity.fasta}}}
 
-Note a couple of tricks in getting Trinity to work:
+A couple of tricks in getting Trinity to work:
    * I have alway needed to set {{{ulimit -s unlimited}}}
    * I have often needed to increase the memory used by jellyfish. e.g. {{{--JM 100G}}}
    * I like to use the {{{--full_cleanup}}} option so I don't get hundres of big files left over.
