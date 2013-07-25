@@ -18,16 +18,16 @@ Run configure:
 ./configure
 }}}
 
-Note that you may have to specify the location of sam.h and libbam with
+Note that you may have to specify the directory location of sam.h and libbam with
 {{{
---with-bam_inc=<absolute_path_to_sam.h>
+--with-bam_inc=<directory_containing_sam.h>
 }}} 
 and 
 {{{
---with-bam_lib=<absolute_path_to_bam_library>
+--with-bam_lib=<directory_containing_bam_library>
 }}}
-if they are not in the usual paths. Note that you need to give the absolute path
-and not a relative path.
+if they are not in the usual paths. *Note that you need to give the absolute path
+and not a relative path*.
 
 Then run:
 {{{
