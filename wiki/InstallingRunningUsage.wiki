@@ -47,7 +47,6 @@ The inputs should be one bam files for each sample. The bam files should have be
 
 The usage information provided by corset is:
 {{{
-corset version 0.9
 
 Usage: corset [options] <input bam files>
 
