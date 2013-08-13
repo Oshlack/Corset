@@ -1,4 +1,5 @@
 #summary Download corset from here
+#labels Featured
 
 = Most Recent/Recommended Version =
 
