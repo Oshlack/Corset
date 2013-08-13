@@ -1,0 +1,10 @@
+#summary Download corset from here
+
+= Most Recent/Recommended Version =
+
+  * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.92.tar.gz corset 0.92] - from 13th August 2013
+
+= Older Versions =
+
+  * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.91.tar.gz corset 0.91] - from 12th June 2013
+  * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.9.tar.gz corset 0.9] - from 30th July 2013
