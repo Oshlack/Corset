@@ -48,6 +48,7 @@ class Transcript{
   void remove(); //remove myself from the reads lists .. 
 
   static int samples;
+  static int groups;
   static int min_counts;
 };
 

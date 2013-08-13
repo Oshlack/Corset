@@ -75,7 +75,7 @@ void * read_bam_file(void * args){
 
    //read each file in the comma separated list
    while(getline(ss,filename,',')){  
-     cout << "Read bam file : "<< filename << endl;
+     cout << "Reading bam file : "<< filename << endl;
      samfile_t *in = 0 ;
      if ((in = samopen(filename.c_str(), "br", NULL)) == 0 | in->header == 0) {
        cerr << "fail to open "<< filename << " for reading." << endl;
@@ -212,7 +212,7 @@ int main(int argc, char **argv){
       break;
     }
     case 'g':{ //the sample groups. Used for the likelihood ratio test
-      cout << "Setting sample groups:" << optarg << endl;
+      cout << "Setting sample groups:" << optarg;
       stringstream ss(optarg);
       string s;
       vector < string > names;
@@ -233,6 +233,8 @@ int main(int argc, char **argv){
 	else
 	  groups.push_back(groups.at(s2));
       }
+      Transcript::groups=ngroups;
+      cout << ", " << Transcript::groups << " groups in total" << endl;
       params+=2;
       break;
     }
@@ -292,6 +294,7 @@ int main(int argc, char **argv){
     //treat each file as a separate group
     for(int s=0; s<smpls; s++)
       groups.push_back(s);
+    Transcript::groups=Transcript::samples;
   }
 
   //before we go any further. Check that there are enough groups and
