@@ -82,7 +82,6 @@ void MakeClusters::processSuperClusters(map<double,string> & distance_thresholds
   //now do the hierarchical clustering...
   cout << "Starting hierarchial clustering..." << endl;
   for(int i=0; clusterList.size()>0; i++){
-    //       for(i=0; i<clusterList.size(); i++){
     if(i % 1000 == 0)
       cout << float(i)/float(1000) << " thousand clusters done" <<endl;
     Cluster * back = clusterList.back();

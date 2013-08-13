@@ -40,7 +40,6 @@ void print(vector<int> x){
 
 
 
-
 double Cluster::get_dist(int i, int j ){
 
   //first, work out how many shared reads we have
@@ -80,11 +79,10 @@ double Cluster::get_dist(int i, int j ){
   if(shared_reads_distance==0)
     return shared_reads_distance; 
   
-
   //now look to see if there is different differential expression between
   //sample which would suggest that the two transcripts do not belong to the
   //same gene.
-  int ngroups=sample_groups.back()+1;
+  int ngroups=Transcript::groups;
   vector<double> x (ngroups,1); //start with 1 count to avoid dividing by 0.
   vector<double> y (ngroups,1);
   for(int s=0; s < Transcript::samples; s++){
@@ -267,7 +265,7 @@ void Cluster::cluster( map<double,string> & thresholds){
     int i=0;
     int j=0;
     double distance = 1 - find_next_pair(n,i,j);
-    if(n>1000 & n % 200==0 )
+    if( n>1000 & n % 200==0 )
       cout << "down to "<<n<< " clusters. dist=" << distance << endl;
     while( distance > itr_d_cut->first & itr_d_cut != thresholds.end() ){ 
       output_clusters( itr_d_cut->second ); //print the results
@@ -327,6 +325,7 @@ void Cluster::initialise_matrix(){
   //loop over transcripts:
   for(int i=0; i<n_trans(); i++)
     get_tran(i)->pos(i);
+
        
   //allocate space for the distance matrix
   dist = new double*[n_trans()];
@@ -351,7 +350,7 @@ void Cluster::initialise_matrix(){
     for(t1=read->align_begin(); t1!=read->align_end(); t1++){
       int i=(*t1)->pos();
       for(t2=read->align_begin(); t2!=t1; t2++){ //flag the elements in the distance matrix
-	int j=(*t2)->pos();                     //which need to be calculated properly.
+	int j=(*t2)->pos();                      //which need to be calculated properly.
 	if(j<i)
 	  dist[i][j]=1;
 	else 

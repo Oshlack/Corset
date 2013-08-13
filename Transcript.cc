@@ -18,6 +18,7 @@ using namespace std;
 // initialise the number of samples to 0.
 // this will be set later on.
 int Transcript::samples=0;
+int Transcript::groups=0;
 int Transcript::min_counts=10;
 
 void Transcript::remove(){
