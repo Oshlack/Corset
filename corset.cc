@@ -99,12 +99,14 @@ void * read_bam_file(void * args){
      
        if(i % 200000 == 0) //output some info about how it's proceeding.
 	 cout << float(i)/float(1000000) << " million alignments read" <<endl; 
+       //       if(i>5000000) break;
        i++;
      }
      bam_destroy1(b);
      samclose(in);
      cout << "Done reading "<< filename << endl;
    }
+   rList->transfer_reads();
    return (void*) rList; //return the alignment list
 }
 
