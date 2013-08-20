@@ -29,13 +29,13 @@ using namespace std;
 // Read is a basic container object for a read. It can record the read ID, 
 // all the transcript alignments for that read and which sample the read belongs to. 
 class Read{
-  string name_;
-  int sample_;
+  //  string name_;
   vector < Transcript * > alignments_;
+  unsigned char sample_;
  public:
-  Read(){name_="";};
-  Read(string name){name_=name; };
-  string get_name(){return name_; } ;
+  //  Read(){name_="";};
+  Read(string name){}; //name_=name; };
+  //  string get_name(){return name_; } ;
   void set_sample(int sample){sample_=sample;};
   int get_sample(){return sample_;};
   int alignments(){return alignments_.size();};
@@ -64,15 +64,16 @@ class Read{
 class ReadList{
  private:
     TranscriptList * transcript_list; 
-    StringSet<Read> reads; 
+    StringSet<Read> * reads_map;
+    vector<Read *> reads_vector;
 
  public:
     //we need to know all the transcripts before we can build a ReadList.
-    ReadList( TranscriptList * transcripts){ transcript_list = transcripts; };
+    ReadList( TranscriptList * transcripts){ transcript_list = transcripts; reads_map = new StringSet<Read> ; };
     //add a new alignment into the list
     void add_alignment(string read, string trans){
       //find the transcript id if it already exists:
-      Read * r = reads.insert(read);
+      Read * r = reads_map->insert(read);
       Transcript * t = transcript_list->insert(trans);
       //don't try to insert an alignment if 1. it already exists or
       //2. if the transcript ID is not in the TranscriptList.
@@ -80,8 +81,16 @@ class ReadList{
 	r->add_alignment(t);
     };
     //    void print(); 
-    StringSet<Read>::iterator begin(){return reads.begin();};
-    StringSet<Read>::iterator end(){return reads.end();};
+
+    void transfer_reads(){ //save memory by clearing the read IDs
+      StringSet<Read>::iterator itr=reads_map->begin();
+      for(; itr!=reads_map->end(); itr++) reads_vector.push_back( itr->second );
+      reads_map->clear();
+      delete reads_map ;
+    }
+
+    vector<Read *>::iterator begin(){return reads_vector.begin();};
+    vector<Read *>::iterator end(){return reads_vector.end();};
 };
 
 
