@@ -296,7 +296,7 @@ int main(int argc, char **argv){
     //treat each file as a separate group
     for(int s=0; s<smpls; s++)
       groups.push_back(s);
-    Transcript::groups=Transcript::samples;
+    Transcript::groups=smpls;
   }
 
   //before we go any further. Check that there are enough groups and
