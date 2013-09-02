@@ -106,3 +106,11 @@ topTags(results)
 
 
 Clusters of interest can then be examined further and annotated. For example by selecting a representative transcript from each cluster and using software such as [http://www.blast2go.com/b2ghome blast2GO] to work out what the gene is.
+
+==Bpipe Pipeline==
+
+[https://code.google.com/p/bpipe/ bpipe] is a nice tool for managing pipelines and Simon Sadedin has proved an example of running the steps above through bpipe [https://code.google.com/p/bpipe/wiki/RNASeqCorset]
+
+
+
+
