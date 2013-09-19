@@ -137,8 +137,8 @@ void print_usage(){
   cout << "\t                  Default: 0.3"  << endl;
   cout << endl;
   cout << "\t -D <double>      The value used for thresholding the log likelihood ratio. The default " << endl;
-  cout << "\t                  value will depend on the number of degrees of freedom (which is 1 - the " << endl;
-  cout << "\t                  number of groups). By default D = 17.5 + 2.5 * ndf, which corresponds " << endl;
+  cout << "\t                  value will depend on the number of degrees of freedom (which is the " << endl;
+  cout << "\t                  number of groups -1). By default D = 17.5 + 2.5 * ndf, which corresponds " << endl;
   cout << "\t                  approximately to a p-value threshold of 10^-5, when there are fewer than" << endl;
   cout << "\t                  10 groups." << endl;
   cout << endl;
