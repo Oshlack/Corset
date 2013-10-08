@@ -369,61 +369,6 @@ void Cluster::initialise_matrix(){
     }
   }
 
-  /*********** NEW CODE ***********************/
-  //for transcript counting only
-  if(n_trans()>1){
-    ofstream transFile;
-    transFile.open("transCountTable.txt",ios_base::app);
-
-    vector < vector<string> > combinations;
-    combinations.resize(Transcript::samples);
-    vector<string>  all_samples_together;
-    vector<string>  temp_trans_list;
-
-    //loop over the reads
-    for(int r=0; r<n_reads(); r++){
-      Read * read=get_read(r);
-      for(t1=read->align_begin(); t1!=read->align_end(); t1++){
-	string trans_name=(*t1)->get_name();
-	temp_trans_list.push_back(trans_name);
-      }
-      sort(temp_trans_list.begin(),temp_trans_list.end());
-      //make a string out of it
-      stringstream temp_combination;
-      vector<string>::iterator it=temp_trans_list.begin();
-      for(; it!=temp_trans_list.end(); it++)
-	temp_combination << *(it) << ",";
-      combinations.at(read->get_sample()).push_back(temp_combination.str());
-      all_samples_together.push_back(temp_combination.str());
-      temp_trans_list.clear();
-    }
-    //now count the instances of each combination:
-    //first sort
-    sort(all_samples_together.begin(),all_samples_together.end());
-    //then find the unique elements
-    vector<string>::iterator UIt = unique_copy(all_samples_together.begin(),all_samples_together.end(),all_samples_together.begin());
-    vector<string>::iterator it = all_samples_together.begin(); 
-
-    //probably need to filter-out stuff with low expression somewhere here..
-    int threshold=10; ///FIX ME later
-    //which combinations should we report?
-    vector<string> to_report;
-    for(it=all_samples_together.begin(); it!=UIt; ++it){
-      int c=0;
-      for(int s=0; s<Transcript::samples; s++) c+=count(combinations.at(s).begin(),combinations.at(s).end(),*it);
-      if(c>=threshold) to_report.push_back(*it);
-    } 
-    
-    //loop again this time actually reporting the values
-    for(int c=0; (to_report.size() > 1 ) && c<to_report.size() ; c++ ){ 
-      transFile << cluster_id_prefix << get_id() << "\t" << to_report.at(c) ;
-      //loop once for each samples:
-      for(int s=0; s<Transcript::samples; s++)
-	transFile << "\t" << count(combinations.at(s).begin(),combinations.at(s).end(),to_report.at(c)) ;
-      transFile << endl;
-    }
-    transFile.close();
-  }
 };
 
 
