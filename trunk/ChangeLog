@@ -1,3 +1,8 @@
+2014-10-08 Nadia Davidson
+	* Removed random code which wasn't meant to be in the released version (oops)
+	* Fixed one line of the documentation which was wrong
+	* Incrementing to version 0.94
+	
 2013-08-27 Nadia Davidson
 	* Edited one line in corset.cc to fix a bug in the number of groups when the -g option was not specified.
 	* Incrementing to version 0.93
