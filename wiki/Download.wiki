@@ -3,8 +3,7 @@
 
 = Most Recent/Recommended Version =
 
-  * <a href="https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.94.tar.gz" target=”_blank” onclick=”_gaq.push(['_trackEvent','Download','0.94',this.href]);”> corset 0.94
-</a> - from 8th October 2013 (minor fix)
+  * <a href="https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.94.tar.gz" target=”_blank” onclick=”_gaq.push(['_trackEvent','Download','0.94',this.href]);”> corset 0.94 </a> - from 8th October 2013 (minor fix)
 
 = Older Versions =
   * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.93.tar.gz corset 0.93] - from 27th August 2013 (bug fix)
