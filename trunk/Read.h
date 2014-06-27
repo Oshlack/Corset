@@ -33,9 +33,7 @@ class Read{
   vector < Transcript * > alignments_;
   unsigned char sample_;
  public:
-  //  Read(){name_="";};
   Read(string name){}; //name_=name; };
-  //  string get_name(){return name_; } ;
   void set_sample(int sample){sample_=sample;};
   int get_sample(){return sample_;};
   int alignments(){return alignments_.size();};
@@ -56,6 +54,18 @@ class Read{
      alignments_.erase(find(align_begin(),align_end(),trans));
   };
 
+  //temp for now
+    bool is_equal( Read * r){
+      if(r->get_sample()!=get_sample()) return false; 
+      int naligns = r->alignments();
+      if(naligns!=alignments()) return false;
+      //now check each transcript
+      vector < Transcript * >::iterator itr=align_begin();
+      for(; itr!=r->align_end(); itr++)
+	if(!has(*(itr))) return false;
+      return true ;
+    };
+
 };
 
 
@@ -64,7 +74,7 @@ class Read{
 class ReadList{
  private:
     TranscriptList * transcript_list; 
-    StringSet<Read> * reads_map;
+    StringSet<Read> * reads_map; //warning this is deleted after the reads are read
     vector<Read *> reads_vector;
 
  public:
@@ -91,6 +101,7 @@ class ReadList{
 
     vector<Read *>::iterator begin(){return reads_vector.begin();};
     vector<Read *>::iterator end(){return reads_vector.end();};
+
 };
 
 

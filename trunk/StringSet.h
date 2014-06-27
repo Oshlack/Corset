@@ -46,7 +46,6 @@ template <class T > class StringSet {
  private:
   /** The underlying data structure is a map **/
   mymap set_map;
-  //MyMap set_map;
   
  public:  
   typedef typename mymap::iterator iterator;

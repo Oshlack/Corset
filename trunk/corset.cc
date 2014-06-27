@@ -342,9 +342,7 @@ int main(int argc, char **argv){
   Transcript::samples=smpls;
   //set-up out data structures ready to receive the alignment information
   TranscriptList * tList = new TranscriptList;
-  vector<ReadList*> rList; //one ReadList per sample
-  
-
+  vector<ReadList*> rList; //one ReadList per sample  
 
   //change to threads parameter later on.
   //for now we have one thread per sample
@@ -376,9 +374,9 @@ int main(int argc, char **argv){
       (*it).second->remove();
     }
   };
-  delete tList; //don't need this anymore, so why not free some space
-
   cout << "Done reading all files. "<< endl;
+
+  delete tList; //don't need this anymore, so why not free some space
 
   cout << "Start to cluster the reads" << endl;
 
