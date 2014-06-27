@@ -27,7 +27,6 @@
 using namespace std;
 
 class Read;
-//void Read::remove(Transcript *);
 
 class Transcript{
   string name_;
@@ -50,6 +49,7 @@ class Transcript{
   static int samples;
   static int groups;
   static int min_counts;
+
 };
 
 typedef StringSet<Transcript> TranscriptList;

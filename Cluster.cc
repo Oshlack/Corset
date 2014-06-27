@@ -165,7 +165,6 @@ void Cluster::merge(int i, int j, int n){
   // i is always > j
   int m=i;
   if(m==l) m=j; //m holds the index of the new merged read_groups
-  // if(i==l) i=j;
 
   //update all the ith row and column to contain the ij pairs total counts
   for(int k=0; k<i; k++){
@@ -371,4 +370,24 @@ void Cluster::initialise_matrix(){
 
 };
 
+void Cluster::print_alignments(){
+  
+  if(n_trans()<1000) return ;
 
+  //  cout << "ntrans=" << n_trans() << "\t";
+  for(int r=0; r<n_reads(); r++){
+    Read * read = get_read(r);
+    int sample = read->get_sample();
+    vector<int> als;
+    vector< Transcript *>::iterator t1;
+    cout << "cluster="<<get_id()<<"\t"<<"sample="<<sample ;
+    for(t1=read->align_begin(); t1!=read->align_end(); t1++){
+      als.push_back((*t1)->pos());
+    }
+    sort(als.begin(),als.end());
+    cout << "\tthere are "<< als.size() << " reads:";
+    for(vector<int>::iterator it=als.begin(); it!=als.end(); it++)
+      std::cout << "\t" << *it ;
+    std::cout << endl ;
+  }
+}

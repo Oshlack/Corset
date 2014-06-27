@@ -88,6 +88,7 @@ void MakeClusters::processSuperClusters(map<double,string> & distance_thresholds
     back->set_id(i);
     back->set_sample_groups(groups);
     back->cluster(distance_thresholds);	 
+    //    back->print_alignments();
     clusterList.pop_back();
     delete back;
   }

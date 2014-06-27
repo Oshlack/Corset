@@ -119,6 +119,9 @@ class Cluster {
      const static string cluster_id_prefix;
      const static string cluster_id_joiner;
      const static string cluster_id_prefix_no_reads;
+
+     void print_alignments();
+
 };
 
 #endif
