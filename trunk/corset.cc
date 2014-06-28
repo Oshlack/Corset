@@ -378,6 +378,8 @@ int main(int argc, char **argv){
 
   delete tList; //don't need this anymore, so why not free some space
 
+  
+
   cout << "Start to cluster the reads" << endl;
 
   //Now the reads are parsed and the clustering and counting is performed.

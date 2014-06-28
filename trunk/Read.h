@@ -94,7 +94,12 @@ class ReadList{
 
     void transfer_reads(){ //save memory by clearing the read IDs
       StringSet<Read>::iterator itr=reads_map->begin();
-      for(; itr!=reads_map->end(); itr++) reads_vector.push_back( itr->second );
+      for(; itr!=reads_map->end(); itr++){
+	if(itr->second->alignments()>1000)
+	  cout << "Found a read with "<<itr->second->alignments() << endl;
+	else 
+	  reads_vector.push_back( itr->second );
+      }
       reads_map->clear();
       delete reads_map ;
     }
