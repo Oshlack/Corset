@@ -32,40 +32,36 @@ class Read{
   //  string name_;
   vector < Transcript * > alignments_;
   unsigned char sample_;
+  int weight_;
  public:
-  Read(string name){}; //name_=name; };
+  Read(string name){ weight_=1; }; //name_=name; };
   void set_sample(int sample){sample_=sample;};
   int get_sample(){return sample_;};
   int alignments(){return alignments_.size();};
+  void set_weight(int weight){ weight_ = weight; };
+  int get_weight(){ return weight_; };
   void add_alignment(Transcript * trans){
     alignments_.push_back(trans);
-    if(!trans->reached_min_counts()){
+    //    if(!trans->reached_min_counts()){
       trans->add_read(this);
-    };
+      //    };
   };
 
   vector < Transcript * >::iterator align_begin(){return alignments_.begin();};
   vector < Transcript * >::iterator align_end(){return alignments_.end();};
 
+  void sort_alignments(){ sort(alignments_.begin(),alignments_.end()); };
+
   //function to check whether an alignment has already been recorded.
   bool has(Transcript* t){return (find(align_begin(),align_end(),t) != align_end());};
 
-  void remove(Transcript * trans){ 
-     alignments_.erase(find(align_begin(),align_end(),trans));
-  };
+  void remove(Transcript * trans){ alignments_.erase(find(align_begin(),align_end(),trans)); };
 
-  //temp for now
-    bool is_equal( Read * r){
-      if(r->get_sample()!=get_sample()) return false; 
-      int naligns = r->alignments();
-      if(naligns!=alignments()) return false;
-      //now check each transcript
-      vector < Transcript * >::iterator itr=align_begin();
-      for(; itr!=r->align_end(); itr++)
-	if(!has(*(itr))) return false;
-      return true ;
-    };
-
+  //check if two reads have align to the same transcripts 
+  //this assumed that "sort_alignments" has been called first.
+  //it is used in ReadList::compactify_reads
+  bool has_same_alignments( Read * r);
+  
 };
 
 
@@ -80,29 +76,12 @@ class ReadList{
  public:
     //we need to know all the transcripts before we can build a ReadList.
     ReadList( TranscriptList * transcripts){ transcript_list = transcripts; reads_map = new StringSet<Read> ; };
-    //add a new alignment into the list
-    void add_alignment(string read, string trans){
-      //find the transcript id if it already exists:
-      Read * r = reads_map->insert(read);
-      Transcript * t = transcript_list->insert(trans);
-      //don't try to insert an alignment if 1. it already exists or
-      //2. if the transcript ID is not in the TranscriptList.
-      if( !r->has(t) )
-	r->add_alignment(t);
-    };
-    //    void print(); 
 
-    void transfer_reads(){ //save memory by clearing the read IDs
-      StringSet<Read>::iterator itr=reads_map->begin();
-      for(; itr!=reads_map->end(); itr++){
-	if(itr->second->alignments()>1000)
-	  cout << "Found a read with "<<itr->second->alignments() << endl;
-	else 
-	  reads_vector.push_back( itr->second );
-      }
-      reads_map->clear();
-      delete reads_map ;
-    }
+    //add a new alignment into the list
+    void add_alignment(string read, string trans);
+
+    //save memory by clearing the read IDs
+    void compactify_reads(TranscriptList * trans); 
 
     vector<Read *>::iterator begin(){return reads_vector.begin();};
     vector<Read *>::iterator end(){return reads_vector.end();};

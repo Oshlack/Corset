@@ -39,15 +39,19 @@ void print(vector<int> x){
 }
 
 
-double Cluster::get_dist(int i, int j ){
+float Cluster::get_dist(int i, int j ){
 
   //first, work out how many shared reads we have
   int shared_reads = 0; 
-  double total_reads_i = 0;
-  double total_reads_j = 0;
+  float total_reads_i = 0;
+  float total_reads_j = 0;
 
   vector<int> sample_shared_read;
+  vector<int> sample_total_reads_i;
+  vector<int> sample_total_reads_j;
   sample_shared_read.resize(Transcript::samples,0);
+  sample_total_reads_i.resize(Transcript::samples,0);
+  sample_total_reads_j.resize(Transcript::samples,0);
 
   for(int s=0; s < Transcript::samples; s++){
     vector<int> & readsG1=read_groups.at(s).at(i);
@@ -57,21 +61,35 @@ double Cluster::get_dist(int i, int j ){
     vector<int>::iterator it2=readsG2.begin();
     
     while(it1!=readsG1.end() && it2!=readsG2.end()){
-      if(*it1 < *it2) ++it1;
-      else if(*it1 > *it2) ++it2;
+      if(*it1 < *it2){
+	sample_total_reads_i.at(s)+=get_read(*it1)->get_weight();
+	++it1;
+      }
+      else if(*it1 > *it2){ 
+	sample_total_reads_j.at(s)+=get_read(*it2)->get_weight();
+	++it2;
+      }
       else {
-	sample_shared_read.at(s)++;
+	//	sample_shared_read.at(s)++;
+	sample_shared_read.at(s)+=get_read(*it1)->get_weight();
+	sample_total_reads_i.at(s)+=get_read(*it1)->get_weight();
+	sample_total_reads_j.at(s)+=get_read(*it2)->get_weight();
 	it1++;
 	it2++;
       }
     }
-    shared_reads+=sample_shared_read.at(s);
+    //finish iterating over the read vector to get the total number of reasd
+    for(;it1!=readsG1.end();it1++) sample_total_reads_i.at(s)+=get_read(*it1)->get_weight();
+    for(;it2!=readsG2.end();it2++) sample_total_reads_j.at(s)+=get_read(*it2)->get_weight();
 
-    total_reads_i+=readsG1.size();
-    total_reads_j+=readsG2.size();
+    shared_reads+=sample_shared_read.at(s);
+    total_reads_i+=sample_total_reads_i.at(s);
+    total_reads_j+=sample_total_reads_j.at(s);
+    //    total_reads_i+=readsG1.size();
+    //   total_reads_j+=readsG2.size();
   }
 
-  double shared_reads_distance = shared_reads / min( total_reads_i, total_reads_j ) ;
+  float shared_reads_distance = shared_reads / min( total_reads_i, total_reads_j ) ;
   
   // there is no need to look for differences in expression
   // if the distance is already at the maximum.
@@ -79,25 +97,28 @@ double Cluster::get_dist(int i, int j ){
     return shared_reads_distance; 
   
   //now look to see if there is different differential expression between
-  //sample which would suggest that the two transcripts do not belong to the
+  //samples which would suggest that the two transcripts do not belong to the
   //same gene.
   int ngroups=Transcript::groups;
-  vector<double> x (ngroups,1); //start with 1 count to avoid dividing by 0.
-  vector<double> y (ngroups,1);
+  vector<float> x (ngroups,1); //start with 1 count to avoid dividing by 0.
+  vector<float> y (ngroups,1);
   for(int s=0; s < Transcript::samples; s++){
     int g=sample_groups.at(s);
     int shared=0.5*sample_shared_read.at(s); //subtract half the shared reads
-    x.at(g)+=read_groups.at(s).at(i).size()-shared; //for each group so that
-    y.at(g)+=read_groups.at(s).at(j).size()-shared; //we're not double counting.
+    x.at(g)+=sample_total_reads_i.at(s)-shared; //for each group so that
+    y.at(g)+=sample_total_reads_j.at(s)-shared; //we're not double counting.
+
+    //    x.at(g)+=read_groups.at(s).at(i).size()-shared; //for each group so that
+    //  y.at(g)+=read_groups.at(s).at(j).size()-shared; //we're not double counting.
   }
 
   //pretend that there's only one sample per group for the moment
   //calculate the likelihood when the ratios are different:
-  double non_null=0;
-  double x_all=0;
-  double y_all=0;
+  float non_null=0;
+  float x_all=0;
+  float y_all=0;
   for(int g=0; g < x.size(); g++){
-    double r=y.at(g)/x.at(g);
+    float r=y.at(g)/x.at(g);
     non_null += y.at(g)*log(r*x.at(g)) - r*x.at(g);
     non_null += x.at(g)*log(x.at(g)) - x.at(g);
     x_all+=x.at(g);
@@ -105,16 +126,16 @@ double Cluster::get_dist(int i, int j ){
   }
 
   //when the ratios are the same.. 
-  double null=0;
-  double r_all=y_all/x_all;
+  float null=0;
+  float r_all=y_all/x_all;
   for(int g=0; g < x.size(); g++){
-    double mean_x = (x.at(g)+y.at(g))/((double)(1+r_all));
+    float mean_x = (x.at(g)+y.at(g))/((float)(1+r_all));
     null += y.at(g)*log(r_all*mean_x) - r_all*mean_x;
     null += x.at(g)*log(mean_x) - mean_x;
   } 
   
-  double D=2*non_null-2*null;
-  if(D>D_cut) //10 is approx. p<0.001
+  float D=2*non_null-2*null;
+  if(D>D_cut) //10 is approx. p<0.001?
     return 0; //set the distance to the max.
 
   return shared_reads_distance;
@@ -195,7 +216,7 @@ void Cluster::merge(int i, int j, int n){
     //  }
 }
 
-double Cluster::find_next_pair(int n, int &max_i, int &max_j){
+float Cluster::find_next_pair(int n, int &max_i, int &max_j){
 
   // find the shortest distance
   // stop if we find a 0 because we know this must be the shortest
@@ -217,6 +238,7 @@ double Cluster::find_next_pair(int n, int &max_i, int &max_j){
   return max;
 }
 
+//returns a vector of counts (one for each cluster), for a given sample
 vector<int> Cluster::get_counts(int s){
   // we need to reorder the sets by reads.
   // start by looping over the reads 
@@ -225,24 +247,27 @@ vector<int> Cluster::get_counts(int s){
   
   read_groups_inv.resize(n_reads());
   counts.resize(read_groups.at(s).size());
-
+  //s=sample, g=cluster
   for(int g=0; g < read_groups.at(s).size() ; g++){
     vector<int>::iterator itrRG = read_groups.at(s).at(g).begin();
     for( ; itrRG != read_groups.at(s).at(g).end() ; itrRG++){
       read_groups_inv.at(*itrRG).insert(g);
     }
-  }
+  } //we now have a 2D array - dim 1: reads, dim 2: cluster
   
-  //now loop over the reads
+  //now loop over the reads (rd=read)
   for(int rd=0; rd < read_groups_inv.size() ; rd++){
     int n_align =  read_groups_inv.at(rd).size() ;
     if(n_align>0){
-      int which_group_pos = rand() % n_align ;
-      set<int>::iterator itr=read_groups_inv.at(rd).begin();
-      advance(itr,which_group_pos); 
-      counts.at(*itr)++; 
+       int weight = get_read(rd)->get_weight();
+       for( ; weight!=0 ; weight--){
+          int which_group_pos = rand() % n_align ;
+          set<int>::iterator itr=read_groups_inv.at(rd).begin();
+          advance(itr,which_group_pos); 
+          counts.at(*itr)++; 
+       }
     }
-  } //randomly choose a transcript for the moment
+  } //randomly choose a cluster is a read maps to more than one cluster
 
   return counts;
 }
@@ -262,7 +287,7 @@ void Cluster::cluster( map<double,string> & thresholds){
   for(int n=n_trans(); n>1 ; n-- ){
     int i=0;
     int j=0;
-    double distance = 1 - find_next_pair(n,i,j);
+    float distance = 1 - find_next_pair(n,i,j);
     if( n>1000 & n % 200==0 )
       cout << "down to "<<n<< " clusters. dist=" << distance << endl;
     while( distance > itr_d_cut->first & itr_d_cut != thresholds.end() ){ 
@@ -325,9 +350,9 @@ void Cluster::initialise_matrix(){
     get_tran(i)->pos(i);
        
   //allocate space for the distance matrix
-  dist = new double*[n_trans()];
+  dist = new float*[n_trans()];
   for(int i=1; i<n_trans(); i++){
-    dist[i]=new double[i+1];
+    dist[i]=new float[i+1];
     for(int j=0; j<i; j++){
       dist[i][j] = 0;
     }

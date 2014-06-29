@@ -52,7 +52,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
   int i=0;
   for(int sample=0; sample<readLists.size(); sample++){
     ReadList reads=*(readLists.at(sample));
-    //map<string,Read*>::iterator rIt;
+
     vector< Read* >::iterator rIt;
     for( rIt=reads.begin() ; rIt != reads.end(); rIt++ ){
       Read * r = *rIt ; //->second;
@@ -68,7 +68,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
 	  checkAgainstCurrentCluster(trans);
       }
       if(i % 100000 == 0)
-	cout << float(i)/float(1000000) << " million reads read" <<endl;
+	cout << float(i)/float(1000000) << " million compact reads read" <<endl;
       i++;
     }
     delete readLists.at(sample);

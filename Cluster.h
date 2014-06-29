@@ -39,13 +39,13 @@ class Cluster {
      //object which store the data
      vector< Transcript * > cluster_;
      vector< Read * > read_;
-     read_group read_groups;
+     read_group read_groups; //3D vector. Dimensions are: sample, transcript, read
      group groups;
-     double ** dist;
+     float ** dist;
      int id_;
      vector<int> sample_groups;
 
-     //private methodS called from "cluster"
+     //private methods called from "cluster"
      
      /** get_dis is responsible for returning the distance between
       ** two clusters (the clusters have positions in the distance 
@@ -58,13 +58,13 @@ class Cluster {
       ** value returned is actually 1-distance described in our paper. So
       ** 1 = clusters share all reads, 0 = clusters share no reads.
       **/
-     double get_dist(int i, int j);
+     float get_dist(int i, int j);
 
      /** find_next_pair will search through the distance matrix and find
       ** the next smalled distance value. i.e. the next two pairs of 
       ** clusters to be merged together (returned as max_i and max_j)
       **/
-     double find_next_pair(int n, int & max_i, int & max_j);
+     float find_next_pair(int n, int & max_i, int & max_j);
 
      /** the merge method takes two clusters (at position i and j in
       ** the distance matrx) and will merge them together. This involves
