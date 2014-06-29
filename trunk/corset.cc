@@ -106,7 +106,7 @@ void * read_bam_file(void * args){
      samclose(in);
      cout << "Done reading "<< filename << endl;
    }
-   rList->transfer_reads();
+   rList->compactify_reads(trans); //reduce the memory usage
    return (void*) rList; //return the alignment list
 }
 

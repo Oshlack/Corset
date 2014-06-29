@@ -86,7 +86,9 @@ template <class T > class StringSet {
     return set_map.end();
   };
 
-  void clear(){ set_map.clear(); }
+  void clear(){ set_map.clear(); } ;
+
+  int size(){ return set_map.size(); } ;
 };
 
 

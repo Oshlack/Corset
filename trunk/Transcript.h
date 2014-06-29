@@ -33,7 +33,7 @@ class Transcript{
   int pos_; // used later by Cluster
   vector<Read*> reads_; //temporary vector so we can quickly remove the alignments
                  //for transcripts with less then min_count hits.
-  bool reached_min_counts_;
+  //  bool reached_min_counts_;
 
  public:
   Transcript(){name_="";};
@@ -43,13 +43,16 @@ class Transcript{
   void pos(int position){pos_=position;};
   int pos(){return pos_;};
   void add_read( Read * read );
-  bool reached_min_counts(){ return reached_min_counts_; };
+  bool reached_min_counts();
+  //return reached_min_counts_; };
+
   void remove(); //remove myself from the reads lists .. 
 
   static int samples;
   static int groups;
   static int min_counts;
 
+  vector<Read*> * get_reads(){ return &reads_ ; } ;
 };
 
 typedef StringSet<Transcript> TranscriptList;

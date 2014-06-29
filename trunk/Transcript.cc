@@ -28,17 +28,24 @@ void Transcript::remove(){
 
 Transcript::Transcript(string name){
     name_=name;
-    reached_min_counts_=false;
+    //    reached_min_counts_=false;
 };
 
 void Transcript::add_read( Read * read ){ 
-  if(reads_.size()>=min_counts){
-    reads_.clear();
-    reached_min_counts_=true;
-  } else {
+  //  if(reads_.size()>=min_counts)//{
+    //    reads_.clear();
+    //   reached_min_counts_=true;
+    //} else {
     reads_.push_back(read) ; 
-  }
+    //  }
 };
 
-
+bool Transcript::reached_min_counts(){
+  int counts=0;
+  for(int i=0; i<reads_.size(); i++){
+    counts+=reads_.at(i)->get_weight();
+    if(counts >= min_counts) return true;
+  }
+  return false;
+}
 
