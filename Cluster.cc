@@ -62,31 +62,22 @@ float Cluster::get_dist(int i, int j ){
     
     while(it1!=readsG1.end() && it2!=readsG2.end()){
       if(*it1 < *it2){
-	sample_total_reads_i.at(s)+=get_read(*it1)->get_weight();
 	++it1;
       }
       else if(*it1 > *it2){ 
-	sample_total_reads_j.at(s)+=get_read(*it2)->get_weight();
 	++it2;
       }
       else {
-	//	sample_shared_read.at(s)++;
-	sample_shared_read.at(s)+=get_read(*it1)->get_weight();
-	sample_total_reads_i.at(s)+=get_read(*it1)->get_weight();
-	sample_total_reads_j.at(s)+=get_read(*it2)->get_weight();
+	sample_shared_read[s]+=get_read(*it1)->get_weight();
 	it1++;
 	it2++;
       }
     }
-    //finish iterating over the read vector to get the total number of reasd
-    for(;it1!=readsG1.end();it1++) sample_total_reads_i.at(s)+=get_read(*it1)->get_weight();
-    for(;it2!=readsG2.end();it2++) sample_total_reads_j.at(s)+=get_read(*it2)->get_weight();
-
-    shared_reads+=sample_shared_read.at(s);
-    total_reads_i+=sample_total_reads_i.at(s);
-    total_reads_j+=sample_total_reads_j.at(s);
-    //    total_reads_i+=readsG1.size();
-    //   total_reads_j+=readsG2.size();
+    shared_reads+=sample_shared_read[s];
+    sample_total_reads_i[s]=read_group_sizes[s][i];
+    sample_total_reads_j[s]=read_group_sizes[s][j];
+    total_reads_i+=sample_total_reads_i[s];
+    total_reads_j+=sample_total_reads_j[s];
   }
 
   float shared_reads_distance = shared_reads / min( total_reads_i, total_reads_j ) ;
@@ -103,13 +94,11 @@ float Cluster::get_dist(int i, int j ){
   vector<float> x (ngroups,1); //start with 1 count to avoid dividing by 0.
   vector<float> y (ngroups,1);
   for(int s=0; s < Transcript::samples; s++){
-    int g=sample_groups.at(s);
-    int shared=0.5*sample_shared_read.at(s); //subtract half the shared reads
-    x.at(g)+=sample_total_reads_i.at(s)-shared; //for each group so that
-    y.at(g)+=sample_total_reads_j.at(s)-shared; //we're not double counting.
+    int g=sample_groups[s];
+    int shared=0.5*sample_shared_read[s]; //subtract half the shared reads
+    x[g]+=sample_total_reads_i[s]-shared; //for each group so that
+    y[g]+=sample_total_reads_j[s]-shared; //we're not double counting.
 
-    //    x.at(g)+=read_groups.at(s).at(i).size()-shared; //for each group so that
-    //  y.at(g)+=read_groups.at(s).at(j).size()-shared; //we're not double counting.
   }
 
   //pretend that there's only one sample per group for the moment
@@ -118,20 +107,20 @@ float Cluster::get_dist(int i, int j ){
   float x_all=0;
   float y_all=0;
   for(int g=0; g < x.size(); g++){
-    float r=y.at(g)/x.at(g);
-    non_null += y.at(g)*log(r*x.at(g)) - r*x.at(g);
-    non_null += x.at(g)*log(x.at(g)) - x.at(g);
-    x_all+=x.at(g);
-    y_all+=y.at(g);
+    float r=y[g]/x[g];
+    non_null += y[g]*log(r*x[g]) - r*x[g];
+    non_null += x[g]*log(x[g]) - x[g];
+    x_all+=x[g];
+    y_all+=y[g];
   }
 
   //when the ratios are the same.. 
   float null=0;
   float r_all=y_all/x_all;
   for(int g=0; g < x.size(); g++){
-    float mean_x = (x.at(g)+y.at(g))/((float)(1+r_all));
-    null += y.at(g)*log(r_all*mean_x) - r_all*mean_x;
-    null += x.at(g)*log(mean_x) - mean_x;
+    float mean_x = (x[g]+y[g])/((float)(1+r_all));
+    null += y[g]*log(r_all*mean_x) - r_all*mean_x;
+    null += x[g]*log(mean_x) - mean_x;
   } 
   
   float D=2*non_null-2*null;
@@ -178,6 +167,17 @@ void Cluster::merge(int i, int j, int n){
     read_groups.at(s).at(i).insert(read_groups.at(s).at(i).begin(),temp.begin(),temp.end());
     read_groups.at(s).at(j).swap(read_groups.at(s).at(l));
     read_groups.at(s).pop_back(); 
+  }
+
+  //set the number of reads for each cluster and sample
+  for(int sample=0; sample<read_groups.size(); ++sample){
+    read_group_sizes.at(sample).clear();
+    for(int cluster=0; cluster < read_groups.at(sample).size(); ++cluster){
+      int sum_of_weights=0;
+      for(int read=0; read < read_groups.at(sample).at(cluster).size(); ++read)
+	sum_of_weights+=get_read(read_groups.at(sample).at(cluster).at(read))->get_weight();
+      read_group_sizes.at(sample).push_back(sum_of_weights);
+    }
   }
 
   //now update the distance matrix
@@ -359,8 +359,11 @@ void Cluster::initialise_matrix(){
   }
   
   read_groups.resize(Transcript::samples);
-  for(int s=0; s < Transcript::samples ; s++)
+  read_group_sizes.resize(Transcript::samples);
+  for(int s=0; s < Transcript::samples ; s++){
     read_groups.at(s).resize(n_trans());
+    read_group_sizes.at(s).resize(n_trans());
+  }
 
   vector< Transcript *>::iterator t1;
   vector< Transcript *>::iterator t2;
@@ -378,6 +381,7 @@ void Cluster::initialise_matrix(){
 	  dist[j][i]=1;
       }
       read_groups.at(sample).at(i).push_back(r); 
+      read_group_sizes.at(sample).at(i)+=(read->get_weight());
     }
   }
   

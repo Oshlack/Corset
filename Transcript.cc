@@ -44,6 +44,7 @@ bool Transcript::reached_min_counts(){
   int counts=0;
   for(int i=0; i<reads_.size(); i++){
     counts+=reads_.at(i)->get_weight();
+    cout << min_counts << endl;
     if(counts >= min_counts) return true;
   }
   return false;

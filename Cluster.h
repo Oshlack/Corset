@@ -39,8 +39,11 @@ class Cluster {
      //object which store the data
      vector< Transcript * > cluster_;
      vector< Read * > read_;
-     read_group read_groups; //3D vector. Dimensions are: sample, transcript, read
+     //3D vector. Dimensions are: sample, transcript, read
+     read_group read_groups; 
      group groups;
+     //a 2D array to hold the number of reads in read_group taking into account the weights
+     group read_group_sizes; 
      float ** dist;
      int id_;
      vector<int> sample_groups;
