@@ -46,12 +46,7 @@ float Cluster::get_dist(int i, int j ){
   float total_reads_i = 0;
   float total_reads_j = 0;
 
-  vector<int> sample_shared_read;
-  vector<int> sample_total_reads_i;
-  vector<int> sample_total_reads_j;
-  sample_shared_read.resize(Transcript::samples,0);
-  sample_total_reads_i.resize(Transcript::samples,0);
-  sample_total_reads_j.resize(Transcript::samples,0);
+  vector<int> sample_shared_read( Transcript::samples,0 );
 
   for(int s=0; s < Transcript::samples; s++){
     vector<int> & readsG1=read_groups.at(s).at(i);
@@ -74,10 +69,8 @@ float Cluster::get_dist(int i, int j ){
       }
     }
     shared_reads+=sample_shared_read[s];
-    sample_total_reads_i[s]=read_group_sizes[s][i];
-    sample_total_reads_j[s]=read_group_sizes[s][j];
-    total_reads_i+=sample_total_reads_i[s];
-    total_reads_j+=sample_total_reads_j[s];
+    total_reads_i+=read_group_sizes[i][s];
+    total_reads_j+=read_group_sizes[j][s];
   }
 
   float shared_reads_distance = shared_reads / min( total_reads_i, total_reads_j ) ;
@@ -96,8 +89,8 @@ float Cluster::get_dist(int i, int j ){
   for(int s=0; s < Transcript::samples; s++){
     int g=sample_groups[s];
     int shared=0.5*sample_shared_read[s]; //subtract half the shared reads
-    x[g]+=sample_total_reads_i[s]-shared; //for each group so that
-    y[g]+=sample_total_reads_j[s]-shared; //we're not double counting.
+    x[g]+=((read_group_sizes[i][s])-shared); //for each group so that
+    y[g]+=((read_group_sizes[j][s])-shared); //we're not double counting.
 
   }
 
@@ -130,7 +123,7 @@ float Cluster::get_dist(int i, int j ){
   return shared_reads_distance;
 }
 
-void Cluster::merge(int i, int j, int n){
+void Cluster::merge(const int i, const int j, const int n){
 
   //update the group information
   int l=n-1;
@@ -169,23 +162,22 @@ void Cluster::merge(int i, int j, int n){
     read_groups.at(s).pop_back(); 
   }
 
-  //set the number of reads for each cluster and sample
-  for(int sample=0; sample<read_groups.size(); ++sample){
-    read_group_sizes.at(sample).clear();
-    for(int cluster=0; cluster < read_groups.at(sample).size(); ++cluster){
-      int sum_of_weights=0;
-      for(int read=0; read < read_groups.at(sample).at(cluster).size(); ++read)
-	sum_of_weights+=get_read(read_groups.at(sample).at(cluster).at(read))->get_weight();
-      read_group_sizes.at(sample).push_back(sum_of_weights);
-    }
+  int m=i;
+  if(m==l) m=j; //m holds the index of the new merged read_groups (in the vectors above)
+  
+  //recalculate the number of reads for cluster, i, sample, s. 
+  for(int s=0; s< Transcript::samples ; s++){
+    read_group_sizes.at(i).at(s)=0;
+    for(int r=0; r< read_groups.at(s).at(m).size(); r++)
+      read_group_sizes.at(i).at(s)+=get_read(read_groups.at(s).at(m).at(r))->get_weight();
   }
+  read_group_sizes.at(j).swap(read_group_sizes.at(l));
+  read_group_sizes.pop_back();
 
   //now update the distance matrix
   // i <-> i & j
   // j <-> l
   // i is always > j
-  int m=i;
-  if(m==l) m=j; //m holds the index of the new merged read_groups
 
   //update all the ith row and column to contain the ij pairs total counts
   for(int k=0; k<i; k++){
@@ -359,11 +351,12 @@ void Cluster::initialise_matrix(){
   }
   
   read_groups.resize(Transcript::samples);
-  read_group_sizes.resize(Transcript::samples);
-  for(int s=0; s < Transcript::samples ; s++){
+  for(int s=0; s < Transcript::samples ; s++)
     read_groups.at(s).resize(n_trans());
-    read_group_sizes.at(s).resize(n_trans());
-  }
+  read_group_sizes.resize(n_trans());
+  for(int t=0; t < n_trans() ; t++)
+    read_group_sizes.at(t).resize(Transcript::samples);
+
 
   vector< Transcript *>::iterator t1;
   vector< Transcript *>::iterator t2;
@@ -381,14 +374,14 @@ void Cluster::initialise_matrix(){
 	  dist[j][i]=1;
       }
       read_groups.at(sample).at(i).push_back(r); 
-      read_group_sizes.at(sample).at(i)+=(read->get_weight());
+      read_group_sizes.at(i).at(sample)+=(read->get_weight());  
     }
   }
   
   groups.resize(n_trans());
   for(int n=0; n < n_trans(); n++)
     groups.at(n).push_back(n);
-  
+
   //now set the distances
   for(int i=1; i<n_trans(); i++){
     for(int j=0; j<i; j++){
