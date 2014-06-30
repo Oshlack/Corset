@@ -212,7 +212,7 @@ float Cluster::find_next_pair(int n, int &max_i, int &max_j){
 
   // find the shortest distance
   // stop if we find a 0 because we know this must be the shortest
-  double max=-1;
+  float max=-1;
   for(int i=1; i<n; i++){
       for(int j=i-1; j>=0; j--){
 	if(dist[i][j]==1){
@@ -383,13 +383,16 @@ void Cluster::initialise_matrix(){
     groups.at(n).push_back(n);
 
   //now set the distances
+  int temp=0;
   for(int i=1; i<n_trans(); i++){
     for(int j=0; j<i; j++){
-      if(dist[i][j]==1)
+      if(dist[i][j]==1){
 	dist[i][j] = get_dist(i,j);
+	temp++;
+      }
     }
   }
-
+  //  cout << temp << "/" << 0.5*n_trans()*n_trans() << "=" << temp / (double)(0.5*n_trans()*n_trans()) << endl;
 };
 
 void Cluster::print_alignments(){
