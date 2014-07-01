@@ -48,11 +48,9 @@
 #include <sam.h>
 #include <bam.h>
 
-#include <gperftools/profiler.h>
+//#include <gperftools/profiler.h>
 
 #define MAX_BAM_LINE_LENGTH 10000
-
-
 
 using namespace std;
 
@@ -385,9 +383,9 @@ int main(int argc, char **argv){
   cout << "Start to cluster the reads" << endl;
 
   //Now the reads are parsed and the clustering and counting is performed.
-  ProfilerStart("gprof.prof");
+  //  ProfilerStart("gprof.prof");
   MakeClusters cList(rList, distance_thresholds,groups); 
-  ProfilerStop();
+  //  ProfilerStop();
 
   cout << "Finished" << endl;
 

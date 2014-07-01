@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <map>
 #include <Read.h>
+#include <SparseArray.h>
 
 using namespace std;
 
@@ -44,7 +45,8 @@ class Cluster {
      group groups;
      //a 2D array to hold the number of reads in read_group taking into account the weights
      group read_group_sizes; 
-     float ** dist;
+     //   float ** dist;
+     SparseArray dist;
      int id_;
      vector<int> sample_groups;
 
@@ -67,7 +69,7 @@ class Cluster {
       ** the next smalled distance value. i.e. the next two pairs of 
       ** clusters to be merged together (returned as max_i and max_j)
       **/
-     float find_next_pair(int n, int & max_i, int & max_j);
+     //    float find_next_pair(int n, int & max_i, int & max_j);
 
      /** the merge method takes two clusters (at position i and j in
       ** the distance matrx) and will merge them together. This involves
@@ -80,7 +82,7 @@ class Cluster {
       ** either own cluster, and the distance matrix is set-up */
      void initialise_matrix();
 
-     void clean_up();
+     //     void clean_up();
 
      /** get_counts will work out how many reads have been allocated to
       ** each cluster given the current configuration of clusters. */
