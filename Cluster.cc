@@ -181,34 +181,35 @@ void Cluster::merge(const int i, const int j, const int n){
 
   //update all the ith row and column to contain the ij pairs total counts
   for(int k=0; k<i; k++){
-    if(dist[i][k]==0 && ((k<j && dist[j][k]==0)||(j<k && dist[k][j]==0))){
-      dist[i][k]=0; //this stuff speeds up the algorithm
+    if(dist.get(i,k)==0 && ((k<j && dist.get(j,k)==0)||(j<k && dist.get(k,j)==0))){
+      dist.set(i,k,0); //this stuff speeds up the algorithm
     }
-    else if( (dist[i][k]==1) && ((j<k && dist[k][j]==1) || (j>k && dist[j][k]==1))){
-      dist[i][k]=1;
+    else if( (dist.get(i,k)==1) && ((j<k && dist.get(k,j)==1) || (j>k && dist.get(j,k)==1))){
+      dist.set(i,k,1);
     }
     else
-      dist[i][k]=get_dist(m,k);
+      dist.set(i,k,get_dist(m,k));
   }
   for(int k=i+1; k<l; k++){
-    if(dist[k][i]==0 && dist[k][j]==0) //j is always less than i
-      dist[k][i]=0;
-    else if (dist[k][i]==1 && dist[k][j]==1)
-      dist[k][i]=1;
+    if(dist.get(k,i)==0 && dist.get(k,j)==0) //j is always less than i
+      dist.set(k,i,0);
+    else if (dist.get(k,i)==1 && dist.get(k,j)==1)
+      dist.set(k,i,1);
     else
-      dist[k][i]=get_dist(m,k);
+      dist.set(k,i,get_dist(m,k));
   }
   
   //move the last row to j to reduce the size of the matrix
   //if(i!=j){ //but only if we haven't already done this.
     for(int k=0; k<j; k++)
-      dist[j][k]=dist[l][k];
+      dist.set(j,k,dist.get(l,k));
     for(int k=j+1; k<n; k++)
-      dist[k][j]=dist[l][k];
+      dist.set(k,j,dist.get(l,k));
     //  }
+    dist.erase_all(l);
 }
 
-float Cluster::find_next_pair(int n, int &max_i, int &max_j){
+/**float Cluster::find_next_pair(int n, int &max_i, int &max_j){
 
   // find the shortest distance
   // stop if we find a 0 because we know this must be the shortest
@@ -228,7 +229,7 @@ float Cluster::find_next_pair(int n, int &max_i, int &max_j){
       }
   }
   return max;
-}
+  }**/
 
 //returns a vector of counts (one for each cluster), for a given sample
 vector<int> Cluster::get_counts(int s){
@@ -267,6 +268,8 @@ vector<int> Cluster::get_counts(int s){
 //vector<Cluster*> Cluster::process(double h, string filename){
 void Cluster::cluster( map<double,string> & thresholds){
 
+  cout << "here1"<< endl;
+
   //nothing to do if we only have one transcript in the cluster
   if(n_trans()>1000)
     cout << "cluster with "<<n_trans() << " transcripts.. this might take a while"<<endl;
@@ -274,12 +277,15 @@ void Cluster::cluster( map<double,string> & thresholds){
   //prepare a few data objects
   initialise_matrix();
 
+  cout << "here2"<< endl;
+
   //start clustering
   map< double,string >::iterator itr_d_cut=thresholds.begin(); //which element of d_cut are we pointing to.
   for(int n=n_trans(); n>1 ; n-- ){
     int i=0;
     int j=0;
-    float distance = 1 - find_next_pair(n,i,j);
+    cout << "N="<<n<<endl;
+    float distance = 1 - dist.get_max_pair(i,j); //find_next_pair(n,i,j);
     if( n>1000 & n % 200==0 )
       cout << "down to "<<n<< " clusters. dist=" << distance << endl;
     while( distance > itr_d_cut->first & itr_d_cut != thresholds.end() ){ 
@@ -291,6 +297,8 @@ void Cluster::cluster( map<double,string> & thresholds){
     //or continue on...
     merge(i,j,n);
   }
+  cout << "here3"<< endl;
+
   //report the final clustering.
   while( itr_d_cut != thresholds.end() ){ 
     output_clusters(itr_d_cut->second);
@@ -327,12 +335,12 @@ void Cluster::output_clusters(string threshold){
 }
 
 
-void Cluster::clean_up(){
+/**void Cluster::clean_up(){
   for(int i=1; i<n_trans(); i++){
     delete dist[i];
   }
   delete dist;
-}
+  }**/
 
 void Cluster::initialise_matrix(){
 
@@ -342,13 +350,14 @@ void Cluster::initialise_matrix(){
     get_tran(i)->pos(i);
        
   //allocate space for the distance matrix
-  dist = new float*[n_trans()];
+  dist.set_width(n_trans());
+  /**  dist = new float*[n_trans()];
   for(int i=1; i<n_trans(); i++){
     dist[i]=new float[i+1];
     for(int j=0; j<i; j++){
       dist[i][j] = 0;
     }
-  }
+    }**/
   
   read_groups.resize(Transcript::samples);
   for(int s=0; s < Transcript::samples ; s++)
@@ -369,9 +378,9 @@ void Cluster::initialise_matrix(){
       for(t2=read->align_begin(); t2!=t1; t2++){ //flag the elements in the distance matrix
 	int j=(*t2)->pos();                      //which need to be calculated properly.
 	if(j<i)
-	  dist[i][j]=1;
+	  dist.set(i,j,1);
 	else 
-	  dist[j][i]=1;
+	  dist.set(j,i,1);
       }
       read_groups.at(sample).at(i).push_back(r); 
       read_group_sizes.at(i).at(sample)+=(read->get_weight());  
@@ -386,8 +395,8 @@ void Cluster::initialise_matrix(){
   int temp=0;
   for(int i=1; i<n_trans(); i++){
     for(int j=0; j<i; j++){
-      if(dist[i][j]==1){
-	dist[i][j] = get_dist(i,j);
+      if(dist.get(i,j)==1){
+	dist.set(i,j,get_dist(i,j));
 	temp++;
       }
     }
