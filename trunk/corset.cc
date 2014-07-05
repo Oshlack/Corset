@@ -66,6 +66,7 @@ typedef struct read_bam_arguments{
 // a function to parse a bam file. It required samtools
 // to read it. The alignments are stored in a ReadList object.
 void * read_bam_file(void * args){
+
    read_bam_args * myargs = (read_bam_args *)(args);
    TranscriptList * trans = myargs->trans;
    string all_file_names = myargs->filename;
@@ -261,7 +262,7 @@ int main(int argc, char **argv){
   }
   
   //convert the distances provided as a string into doubles
-  map<double,string> distance_thresholds;
+  map<float,string> distance_thresholds;
   char * cstr = new char[distance_string.length()+1];
   strcpy(cstr, distance_string.c_str());
   char * single_string = strtok(cstr,",");
@@ -313,7 +314,7 @@ int main(int argc, char **argv){
     Cluster::D_cut=17.5+2.5*(groups.size()-1);      
   
   //test whether the output files already exist
-  for (map<double,string>::iterator it=distance_thresholds.begin(); it!=distance_thresholds.end(); ++it){
+  for (map<float,string>::iterator it=distance_thresholds.begin(); it!=distance_thresholds.end(); ++it){
     string type[]={Cluster::file_counts,Cluster::file_clusters};
     for(int t=0; t < 2; t++){
       string filename(Cluster::file_prefix+type[t]+it->second+Cluster::file_ext);
@@ -363,7 +364,7 @@ int main(int argc, char **argv){
       if(Transcript::min_counts==0){ //output clusters with no reads in this special case
 	n++;
 	//output clusters
-	for (map<double,string>::iterator dis=distance_thresholds.begin(); dis!=distance_thresholds.end(); ++dis){
+	for (map<float,string>::iterator dis=distance_thresholds.begin(); dis!=distance_thresholds.end(); ++dis){
 	  ofstream clusterFile;
 	  string filename(Cluster::file_prefix+Cluster::file_clusters+dis->second+Cluster::file_ext);
 	  clusterFile.open(filename.c_str(),ios_base::app);
@@ -376,9 +377,7 @@ int main(int argc, char **argv){
   };
   cout << "Done reading all files. "<< endl;
 
-  delete tList; //don't need this anymore, so why not free some space
-
-  
+  delete tList; //don't need this anymore, so why not free some space  
 
   cout << "Start to cluster the reads" << endl;
 

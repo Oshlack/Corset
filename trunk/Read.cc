@@ -20,7 +20,7 @@ void ReadList::add_alignment(string read, string trans){
 
 void ReadList::compactify_reads(TranscriptList * trans){ //save memory by clearing the read IDs
   // first lets sort the alignments for each read
-  int reads_before=0;
+  //  int reads_before=0;
   StringSet<Read>::iterator itr=reads_map->begin();
   for(; itr!=reads_map->end(); itr++) itr->second->sort_alignments();
 
@@ -29,7 +29,7 @@ void ReadList::compactify_reads(TranscriptList * trans){ //save memory by cleari
   for(;transItr!=trans->end(); transItr++){
     vector<Read*> * reads = transItr->second->get_reads();
     int reads_size=reads->size();
-    reads_before+=reads_size;
+    // reads_before+=reads_size;
     for(int i=0; i < (reads_size - 1); i++){
       if(reads->at(i)->get_weight()!=0){
 	for(int j=(i+1) ; j < reads_size ; j++){
@@ -49,18 +49,18 @@ void ReadList::compactify_reads(TranscriptList * trans){ //save memory by cleari
     }
   }
 
-  int reads_after=0;
+  /**  int reads_after=0;
   for(transItr=trans->begin();transItr!=trans->end(); transItr++){
     vector<Read*> * reads = transItr->second->get_reads();
     reads_after+=reads->size();
   }
-  cout << reads_before<< " " << reads_after << " ";
+  cout << reads_before<< " " << reads_after << " ";**/
 
   int removed2=0;
   for(itr=reads_map->begin(); itr!=reads_map->end(); itr++){
     //remove zero weight reads at the end...
     Read * r = itr->second;
-    if(r->get_weight()!=0)
+    if(r->get_weight()!=0 )
       reads_vector.push_back( r );
     else{
       removed2++;
@@ -70,7 +70,7 @@ void ReadList::compactify_reads(TranscriptList * trans){ //save memory by cleari
     //        cout << "Found a read with "<<itr->second->alignments() << endl;
     //      else
   }
-  cout << removed2 << " " << reads_map->size() << " " << reads_vector.size() << endl;
+  //  cout << removed2 << " " << reads_map->size() << " " << reads_vector.size() << endl;
   reads_map->clear();
   delete reads_map ;
 }

@@ -12,7 +12,7 @@
 using namespace std;
 
 //can be set by user (see corset.cc)
-double Cluster::D_cut=0;
+float Cluster::D_cut=0;
 string Cluster::file_prefix="";
 
 //constants
@@ -22,6 +22,7 @@ const string Cluster::file_ext=".txt";
 const string Cluster::cluster_id_prefix="Cluster-";
 const string Cluster::cluster_id_joiner=".";
 const string Cluster::cluster_id_prefix_no_reads="NoReadsCluster-";
+const unsigned char Cluster::distMAX=255;
 
 //getter/setter methods
 void Cluster::add_tran(Transcript * trans){ cluster_.push_back(trans); };
@@ -181,45 +182,64 @@ void Cluster::merge(const int i, const int j, const int n){
 
   //update all the ith row and column to contain the ij pairs total counts
   for(int k=0; k<i; k++){
-    if(dist.get(i,k)==0 && ((k<j && dist.get(j,k)==0)||(j<k && dist.get(k,j)==0))){
-      dist.set(i,k,0); //this stuff speeds up the algorithm
+    if(dist[i][k]==0 && ((k<j && dist[j][k]==0)||(j<k && dist[k][j]==0))){
+      dist[i][k]=0; //this stuff speeds up the algorithm
     }
-    else if( (dist.get(i,k)==1) && ((j<k && dist.get(k,j)==1) || (j>k && dist.get(j,k)==1))){
-      dist.set(i,k,1);
+    else if( (dist[i][k]==Cluster::distMAX) && ((j<k && dist[k][j]==Cluster::distMAX) || (j>k && dist[j][k]==Cluster::distMAX))){
+      dist[i][k]=Cluster::distMAX;
     }
     else
-      dist.set(i,k,get_dist(m,k));
+      dist[i][k]=get_dist(m,k)*Cluster::distMAX;
   }
   for(int k=i+1; k<l; k++){
-    if(dist.get(k,i)==0 && dist.get(k,j)==0) //j is always less than i
-      dist.set(k,i,0);
-    else if (dist.get(k,i)==1 && dist.get(k,j)==1)
-      dist.set(k,i,1);
+    if(dist[k][i]==0 && dist[k][j]==0) //j is always less than i
+      dist[k][i]=0;
+    else if (dist[k][i]==Cluster::distMAX && dist[k][j]==Cluster::distMAX)
+      dist[k][i]=Cluster::distMAX;
     else
-      dist.set(k,i,get_dist(m,k));
+      dist[k][i]=get_dist(m,k)*Cluster::distMAX;
   }
   
   //move the last row to j to reduce the size of the matrix
   //if(i!=j){ //but only if we haven't already done this.
     for(int k=0; k<j; k++)
-      dist.set(j,k,dist.get(l,k));
+      dist[j][k]=dist[l][k];
     for(int k=j+1; k<n; k++)
-      dist.set(k,j,dist.get(l,k));
+      dist[k][j]=dist[l][k];
     //  }
-    dist.erase_all(l);
 }
 
-/**float Cluster::find_next_pair(int n, int &max_i, int &max_j){
 
+unsigned char Cluster::find_next_pair(int n, int &max_i, int &max_j){
   // find the shortest distance
-  // stop if we find a 0 because we know this must be the shortest
+  // stop if we find the distMax because we know this must be the largest
+  
+  //if the last distance found was distMax, keep looking from that position
+  //this speeds up the clustering a lot for large dist arrays
+  if(!Cluster::zero_dist_done){
+    for(int i=Cluster::zero_dist_i; i<n; i++){
+      for(int j=Cluster::zero_dist_j; j>=0; j--){
+	if(dist[i][j]==Cluster::distMAX){
+	  max_i=i;
+	  max_j=j;
+	  Cluster::zero_dist_i=i;
+	  Cluster::zero_dist_j=j;
+	  return Cluster::distMAX;
+	}
+      }
+    }
+  }
+  //if the last distance wasn't the max, just search
+  //through the array for the max in the usual way
   float max=-1;
   for(int i=1; i<n; i++){
       for(int j=i-1; j>=0; j--){
-	if(dist[i][j]==1){
+	if(dist[i][j]==Cluster::distMAX){
 	  max_i=i;
 	  max_j=j;
-	  return 1;
+	  Cluster::zero_dist_i=i;
+	  Cluster::zero_dist_j=j;
+	  return Cluster::distMAX;
 	}
 	if(dist[i][j]>max){
 	  max=dist[i][j];
@@ -228,8 +248,9 @@ void Cluster::merge(const int i, const int j, const int n){
 	}
       }
   }
+  Cluster::zero_dist_done=true;
   return max;
-  }**/
+}
 
 //returns a vector of counts (one for each cluster), for a given sample
 vector<int> Cluster::get_counts(int s){
@@ -265,10 +286,8 @@ vector<int> Cluster::get_counts(int s){
   return counts;
 }
 
-//vector<Cluster*> Cluster::process(double h, string filename){
-void Cluster::cluster( map<double,string> & thresholds){
-
-  cout << "here1"<< endl;
+//vector<Cluster*> Cluster::process(float h, string filename){
+void Cluster::cluster( map<float,string> & thresholds){
 
   //nothing to do if we only have one transcript in the cluster
   if(n_trans()>1000)
@@ -277,33 +296,33 @@ void Cluster::cluster( map<double,string> & thresholds){
   //prepare a few data objects
   initialise_matrix();
 
-  cout << "here2"<< endl;
-
   //start clustering
-  map< double,string >::iterator itr_d_cut=thresholds.begin(); //which element of d_cut are we pointing to.
+  map< float,string >::iterator itr_d_cut=thresholds.begin(); //which element of d_cut are we pointing to.
   for(int n=n_trans(); n>1 ; n-- ){
     int i=0;
     int j=0;
-    cout << "N="<<n<<endl;
-    float distance = 1 - dist.get_max_pair(i,j); //find_next_pair(n,i,j);
+    float distance = 1 - ((float)find_next_pair(n,i,j))/Cluster::distMAX;
     if( n>1000 & n % 200==0 )
       cout << "down to "<<n<< " clusters. dist=" << distance << endl;
     while( distance > itr_d_cut->first & itr_d_cut != thresholds.end() ){ 
       output_clusters( itr_d_cut->second ); //print the results
       itr_d_cut++;
     }
-    if(distance==1) break;
+    //stop when we go over the final threshold, or when the distance is the max
+    if(itr_d_cut == thresholds.end() || distance==1 ) break;
+    //    if(distance==1) break;
     
     //or continue on...
     merge(i,j,n);
   }
-  cout << "here3"<< endl;
 
   //report the final clustering.
   while( itr_d_cut != thresholds.end() ){ 
     output_clusters(itr_d_cut->second);
     itr_d_cut++;
   }
+
+  clean_up();
 }
 
 
@@ -335,12 +354,12 @@ void Cluster::output_clusters(string threshold){
 }
 
 
-/**void Cluster::clean_up(){
+void Cluster::clean_up(){
   for(int i=1; i<n_trans(); i++){
     delete dist[i];
   }
   delete dist;
-  }**/
+}
 
 void Cluster::initialise_matrix(){
 
@@ -350,14 +369,14 @@ void Cluster::initialise_matrix(){
     get_tran(i)->pos(i);
        
   //allocate space for the distance matrix
-  dist.set_width(n_trans());
-  /**  dist = new float*[n_trans()];
+  
+  dist = new unsigned char * [n_trans()];
   for(int i=1; i<n_trans(); i++){
-    dist[i]=new float[i+1];
+    dist[i]=new unsigned char [i+1];
     for(int j=0; j<i; j++){
       dist[i][j] = 0;
     }
-    }**/
+  }
   
   read_groups.resize(Transcript::samples);
   for(int s=0; s < Transcript::samples ; s++)
@@ -378,9 +397,9 @@ void Cluster::initialise_matrix(){
       for(t2=read->align_begin(); t2!=t1; t2++){ //flag the elements in the distance matrix
 	int j=(*t2)->pos();                      //which need to be calculated properly.
 	if(j<i)
-	  dist.set(i,j,1);
+	  dist[i][j]=Cluster::distMAX;
 	else 
-	  dist.set(j,i,1);
+	  dist[j][i]=Cluster::distMAX;
       }
       read_groups.at(sample).at(i).push_back(r); 
       read_group_sizes.at(i).at(sample)+=(read->get_weight());  
@@ -392,16 +411,20 @@ void Cluster::initialise_matrix(){
     groups.at(n).push_back(n);
 
   //now set the distances
-  int temp=0;
+  //  int temp=0;
   for(int i=1; i<n_trans(); i++){
     for(int j=0; j<i; j++){
-      if(dist.get(i,j)==1){
-	dist.set(i,j,get_dist(i,j));
-	temp++;
+      if(dist[i][j]==Cluster::distMAX){
+	dist[i][j] = get_dist(i,j)*Cluster::distMAX;
+	//	temp++;
       }
     }
   }
   //  cout << temp << "/" << 0.5*n_trans()*n_trans() << "=" << temp / (double)(0.5*n_trans()*n_trans()) << endl;
+
+  zero_dist_done = false;
+  zero_dist_i=1;
+  zero_dist_j=0;
 };
 
 void Cluster::print_alignments(){
