@@ -78,7 +78,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
   transMap.clear();
 }
 
-void MakeClusters::processSuperClusters(map<double,string> & distance_thresholds, vector<int> & groups){
+void MakeClusters::processSuperClusters(map<float,string> & distance_thresholds, vector<int> & groups){
   //now do the hierarchical clustering...
   cout << "Starting hierarchial clustering..." << endl;
   for(int i=0; clusterList.size()>0; i++){
@@ -95,7 +95,7 @@ void MakeClusters::processSuperClusters(map<double,string> & distance_thresholds
 }
 
 MakeClusters::MakeClusters(vector<ReadList*> & readLists, 
-			   map<double,string> & distance_thresholds, 
+			   map<float,string> & distance_thresholds, 
 			   vector<int> & groups){
 
   //stage 1: process all the reads and looked for shared hits.

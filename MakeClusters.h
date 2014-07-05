@@ -32,10 +32,10 @@ class MakeClusters {
      pair< Transcript * const, Cluster * > * getMapElement(Transcript * trans);
      void checkAgainstCurrentCluster(Transcript * trans);
      void makeSuperClusters(vector<ReadList*> & readLists);
-     void processSuperClusters(map<double,string> & distance_thresholds, vector<int> & groups);
+     void processSuperClusters(map<float,string> & distance_thresholds, vector<int> & groups);
      
  public:
-     MakeClusters(vector<ReadList*> & readLists, map<double,string> & distance_thresholds, vector<int> & groups);
+     MakeClusters(vector<ReadList*> & readLists, map<float,string> & distance_thresholds, vector<int> & groups);
      
 };
 
