@@ -385,7 +385,6 @@ void Cluster::initialise_matrix(){
   for(int t=0; t < n_trans() ; t++)
     read_group_sizes.at(t).resize(Transcript::samples);
 
-
   vector< Transcript *>::iterator t1;
   vector< Transcript *>::iterator t2;
   for(int r=0; r<n_reads(); r++){

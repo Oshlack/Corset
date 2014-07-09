@@ -7,14 +7,16 @@ bool Read::has_same_alignments( Read * r){
   return equal(align_begin(),align_end(),r->align_begin());
 };
 
-void ReadList::add_alignment(string read, string trans){
+void ReadList::add_alignment(string read, string trans, int sample){
   //find the transcript id if it already exists:
   Read * r = reads_map->insert(read);
   Transcript * t = transcript_list->insert(trans);
   //don't try to insert an alignment if 1. it already exists or
   //2. if the transcript ID is not in the TranscriptList.
-  if( !r->has(t) )
+  if( !r->has(t) ){
     r->add_alignment(t);
+    r->set_sample(sample);
+  }
 };
 //    void print();
 
@@ -29,7 +31,6 @@ void ReadList::compactify_reads(TranscriptList * trans){ //save memory by cleari
   for(;transItr!=trans->end(); transItr++){
     vector<Read*> * reads = transItr->second->get_reads();
     int reads_size=reads->size();
-    // reads_before+=reads_size;
     for(int i=0; i < (reads_size - 1); i++){
       if(reads->at(i)->get_weight()!=0){
 	for(int j=(i+1) ; j < reads_size ; j++){
@@ -63,7 +64,7 @@ void ReadList::compactify_reads(TranscriptList * trans){ //save memory by cleari
     if(r->get_weight()!=0 )
       reads_vector.push_back( r );
     else{
-      removed2++;
+      //   removed2++;
       delete r;
     }
     //      if(itr->second->alignments()>1000)

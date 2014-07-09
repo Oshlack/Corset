@@ -56,7 +56,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
     vector< Read* >::iterator rIt;
     for( rIt=reads.begin() ; rIt != reads.end(); rIt++ ){
       Read * r = *rIt ; //->second;
-      r->set_sample(sample);
+      //r->set_sample(sample);
       vector< Transcript * >::iterator tIt ;
       for( tIt=r->align_begin() ; tIt != r->align_end(); tIt++ ){
 	Transcript * trans=*tIt;

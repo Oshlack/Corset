@@ -78,7 +78,7 @@ class ReadList{
     ReadList( TranscriptList * transcripts){ transcript_list = transcripts; reads_map = new StringSet<Read> ; };
 
     //add a new alignment into the list
-    void add_alignment(string read, string trans);
+    void add_alignment(string read, string trans, int sample);
 
     //save memory by clearing the read IDs
     void compactify_reads(TranscriptList * trans); 

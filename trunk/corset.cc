@@ -60,6 +60,7 @@ using namespace std;
 typedef struct read_bam_arguments{
   string filename;
   TranscriptList * trans;
+  int sample;
 } read_bam_args ;
 
 
@@ -70,6 +71,7 @@ void * read_bam_file(void * args){
    read_bam_args * myargs = (read_bam_args *)(args);
    TranscriptList * trans = myargs->trans;
    string all_file_names = myargs->filename;
+   int sample = myargs->sample;
    ReadList * rList = new ReadList(trans);
    string filename;
    stringstream ss(all_file_names);
@@ -95,9 +97,8 @@ void * read_bam_file(void * args){
        //add the alignment into our data object
        string read_name=string(bam1_qname(b));
        int tid=b->core.tid;
-       if( tid != -1 ) //unmapped reads have tid=-1
-	 rList->add_alignment(read_name, string(in->header->target_name[tid]) ); 
-     
+       if( tid != -1 )  //unmapped reads have tid=-1
+	 rList->add_alignment(read_name, string(in->header->target_name[tid]),sample); 
        if(i % 200000 == 0) //output some info about how it's proceeding.
 	 cout << float(i)/float(1000000) << " million alignments read" <<endl; 
        //       if(i>5000000) break;
@@ -353,6 +354,7 @@ int main(int argc, char **argv){
   for(int bam_file=0; bam_file < smpls; bam_file++){
     thread_args[bam_file].filename = string(argv[params+bam_file]);
     thread_args[bam_file].trans = tList;
+    thread_args[bam_file].sample = bam_file;
     rList.push_back((ReadList*)(read_bam_file(&thread_args[bam_file])));
   } //non-threads
 
