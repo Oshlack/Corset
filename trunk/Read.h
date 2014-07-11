@@ -9,7 +9,7 @@
  ** Read and ReadList. 
  **
  ** Author: Nadia Davidson
- ** Modified: 3 May 2013
+ ** Modified: 11th July 2014
  **/
 
 #ifndef READ_H
@@ -42,9 +42,7 @@ class Read{
   int get_weight(){ return weight_; };
   void add_alignment(Transcript * trans){
     alignments_.push_back(trans);
-    //    if(!trans->reached_min_counts()){
-      trans->add_read(this);
-      //    };
+    trans->add_read(this);
   };
 
   vector < Transcript * >::iterator align_begin(){return alignments_.begin();};
@@ -57,7 +55,7 @@ class Read{
 
   void remove(Transcript * trans){ alignments_.erase(find(align_begin(),align_end(),trans)); };
 
-  //check if two reads have align to the same transcripts 
+  //check if two reads align to all the same transcripts 
   //this assumed that "sort_alignments" has been called first.
   //it is used in ReadList::compactify_reads
   bool has_same_alignments( Read * r);
@@ -80,7 +78,10 @@ class ReadList{
     //add a new alignment into the list
     void add_alignment(string read, string trans, int sample);
 
-    //save memory by clearing the read IDs
+    //saves memory by reducing each read into a set of
+    //"compact reads" with a weight.
+    //Also the map object is clear and the reads are
+    //stored as a vector instead. Read IDs are cleared.
     void compactify_reads(TranscriptList * trans); 
 
     vector<Read *>::iterator begin(){return reads_vector.begin();};

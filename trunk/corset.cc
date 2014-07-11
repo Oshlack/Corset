@@ -116,11 +116,13 @@ void * read_bam_file(void * args){
 // combination of command line options.
 void print_usage(){
   cout << endl;
-  cout << "corset version " << VERSION << endl;
+  cout << "Corset Version "<< VERSION << endl;
+  cout << endl;
+  cout << "Corset clusters contigs and counts reads from de novo assembled transcriptomes." << endl;
   cout << endl;
   cout << "Usage: corset [options] <input bam files>" << endl;
   cout << endl;
-  cout << "input bam files:" << endl;
+  cout << "Input bam files:" << endl;
   cout << "\t The input files should be multi-mapped bam files. They can be single, paired-end or mixed" << endl;
   cout << "\t and do not need to be indexed. A space separated list should be given." << endl;
   cout << "\t e.g. corset sample1.bam sample2.bam sample3.bam" << endl;
@@ -130,7 +132,7 @@ void print_usage(){
   cout << "\t been mapped twice or more, you can used a comma separated list like below:" << endl;
   cout << "\t corset sample1_Trinity.bam,sample1_Oases.bam sample2_Trinity.bam,sample2_Oases.bam ..." << endl;
   cout << endl;
-  cout << "options are:" << endl;
+  cout << "Options are:" << endl;
   cout << endl;
   cout << "\t -d <double list> A comma separated list of distance thresholds. The range must be" << endl;
   cout << "\t                  between 0 and 1. e.g -d 0.4,0.5. If more than one distance threshold" << endl;
@@ -157,13 +159,15 @@ void print_usage(){
   cout << "\t                  <prefix>-counts.txt and <prefix>-clusters.txt. Default filenames are:" << endl;
   cout << "\t                  counts.txt and clusters.txt" << endl;
   cout << endl;
-  cout << "\t -f <true/false>  Specifies whether the outputfiles should be overwritten if they already exist." << endl;
+  cout << "\t -f <true/false>  Specifies whether the output files should be overwritten if they already exist." << endl;
   cout << "\t                  Default: false" << endl;
   cout << endl;
   cout << "\t -n <string list> Specifies the sample names to be used in the header of the output count file." << endl;
   cout << "\t                  This should be a comma separated list without spaces." << endl;
   cout << "\t                  e.g. -n Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA etc." << endl;
   cout << "\t                  Default: the input filenames will be used." << endl;
+  cout << endl;
+  cout << "Please see https://code.google.com/p/corset-project/ for more information"<< endl;
   cout << endl;
 }
 

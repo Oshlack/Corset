@@ -13,6 +13,8 @@
  ** in the MakeClusters class, then the Cluster::cluster method must be
  ** called to actually perform the clustering. See the description
  ** below for an outline of the Cluster::cluster algorithm.
+ **
+ ** Last Modified: 11th July 2014, NMD
  **/
 
 #ifndef ONECLUSTER_H
@@ -81,11 +83,7 @@ class Cluster {
       ** the next smalled distance value. i.e. the next two pairs of 
       ** clusters to be merged together (returned as max_i and max_j)
       **/
-
      unsigned char find_next_pair(int n, int & max_i, int & max_j);
-
-     //    float find_next_pair(int n, int & max_i, int & max_j);
-
 
      /** the merge method takes two clusters (at position i and j in
       ** the distance matrx) and will merge them together. This involves
