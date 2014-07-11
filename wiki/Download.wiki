@@ -3,13 +3,12 @@
 
 = Most Recent/Recommended Version =
 
-  * <a href="https://googledrive.com/host/0B1FwZagazjpcRFN2eVVxdXc5c0k/corset-1.00.tar.gz"> corset-1.00.tar.gz </a> - from 11th July 2014. Major improvements in memory usage.
+  * [https://googledrive.com/host/0B1FwZagazjpcRFN2eVVxdXc5c0k/corset-1.00.tar.gz corset 1.00] - from 11th July 2014 (major improvements in memory usage over older version).
+
 
 = Older Versions =
 
-  * <a href="https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.94.tar.gz" target=”_blank” onclick=”ga('send','event','Download','click','0.94');”> corset 0.94 </a> - from 8th October 2013 (minor fix)
-
-= Older Versions =
+  * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.94.tar.gz corset 0.94] - from 8th October 2013 (minor fix)
   * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.93.tar.gz corset 0.93] - from 27th August 2013 (bug fix)
   * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.92.tar.gz corset 0.92] - from 13th August 2013 (bug fix)
   * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.91.tar.gz corset 0.91] - from 12th June 2013 (install fix)
