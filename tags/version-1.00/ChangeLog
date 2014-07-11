@@ -1,0 +1,19 @@
+2014-10-08 Nadia Davidson
+	* Removed random code which wasn't meant to be in the released version (oops)
+	* Fixed one line of the documentation which was wrong
+	* Incrementing to version 0.94
+	
+2013-08-27 Nadia Davidson
+	* Edited one line in corset.cc to fix a bug in the number of groups when the -g option was not specified.
+	* Incrementing to version 0.93
+
+2013-08-13 Nadia Davidson
+	* Edited the file corset.cc, Transcript.h, Transcript.cc and Cluster.cc. A bug was identified in the get_dist() function in Cluster.cc, where the ngroups variable was being incorrectly set. Older versions of the code will still run if the groups list is sorted e.g. "1,1,2,2,3,3" but not for orders such as "1,2,3,3,2,1".
+	* Incrementing to version 0.92
+
+2013-07-30 Nadia Davidson
+	* Editied the configure file to switch the order of libbam and libz. This was causing issues when compiling under ubuntu.
+	* Incrementing the version number to 0.91
+
+2013-06-15 Nadia Davidson
+	* First version (0.9) or corset.
