@@ -410,16 +410,13 @@ void Cluster::initialise_matrix(){
     groups.at(n).push_back(n);
 
   //now set the distances
-  //  int temp=0;
   for(int i=1; i<n_trans(); i++){
     for(int j=0; j<i; j++){
       if(dist[i][j]==Cluster::distMAX){
 	dist[i][j] = get_dist(i,j)*Cluster::distMAX;
-	//	temp++;
       }
     }
   }
-  //  cout << temp << "/" << 0.5*n_trans()*n_trans() << "=" << temp / (double)(0.5*n_trans()*n_trans()) << endl;
 
   zero_dist_done = false;
   zero_dist_i=1;
@@ -430,7 +427,6 @@ void Cluster::print_alignments(){
   
   if(n_trans()<1000) return ;
 
-  //  cout << "ntrans=" << n_trans() << "\t";
   for(int r=0; r<n_reads(); r++){
     Read * read = get_read(r);
     int sample = read->get_sample();

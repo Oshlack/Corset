@@ -1,3 +1,8 @@
+// Copyright 2014 Nadia Davidson for Murdoch Childrens Research
+// Institute Australia. This program is distributed under the GNU
+// General Public License. We also ask that you cite this software in
+// publications where you made use of it for any part of the data
+// analysis.
 
 #include<Read.h>
 
@@ -18,11 +23,16 @@ void ReadList::add_alignment(string read, string trans, int sample){
     r->set_sample(sample);
   }
 };
-//    void print();
 
-void ReadList::compactify_reads(TranscriptList * trans){ //save memory by clearing the read IDs
+//save memory by reducing all the reads of a sample into
+//a vector of "compact reads". compact reads are stored in
+//regular read object, with a weight equal to the number
+//of regular reads. This saves a lot of RAM if reads from multiple
+//samples are processed. The map obect (StringSet) with read IDs
+//is also destroyed to save memory.
+void ReadList::compactify_reads(TranscriptList * trans){ 
   // first lets sort the alignments for each read
-  //  int reads_before=0;
+
   StringSet<Read>::iterator itr=reads_map->begin();
   for(; itr!=reads_map->end(); itr++) itr->second->sort_alignments();
 
@@ -37,41 +47,30 @@ void ReadList::compactify_reads(TranscriptList * trans){ //save memory by cleari
 	  if( reads->at(j)->get_weight()!=0 &&
 	      reads->at(i)->has_same_alignments(reads->at(j))){
 	    int new_weight = reads->at(i)->get_weight() + reads->at(j)->get_weight() ;
-	    reads->at(i)->set_weight( new_weight ) ;
+	    reads->at(i)->set_weight( new_weight ) ; //add to the weight
 	    reads->at(j)->set_weight( 0 );  //set the weight of duplicates to zero
 	  }
 	}
       }
     }
-    //now remove the read from each transcripts list of reads
+    //now remove the reads with weight=0 from each transcript's list of reads
     for(int k=reads->size(); k > 0 ; --k){
       if(reads->at(k-1)->get_weight()==0)
 	reads->erase(reads->begin()+k-1 );
     }
   }
 
-  /**  int reads_after=0;
-  for(transItr=trans->begin();transItr!=trans->end(); transItr++){
-    vector<Read*> * reads = transItr->second->get_reads();
-    reads_after+=reads->size();
-  }
-  cout << reads_before<< " " << reads_after << " ";**/
-
-  int removed2=0;
   for(itr=reads_map->begin(); itr!=reads_map->end(); itr++){
     //remove zero weight reads at the end...
     Read * r = itr->second;
     if(r->get_weight()!=0 )
       reads_vector.push_back( r );
-    else{
-      //   removed2++;
+    else 
       delete r;
-    }
     //      if(itr->second->alignments()>1000)
     //        cout << "Found a read with "<<itr->second->alignments() << endl;
     //      else
   }
-  //  cout << removed2 << " " << reads_map->size() << " " << reads_vector.size() << endl;
   reads_map->clear();
   delete reads_map ;
 }
