@@ -2,10 +2,7 @@
 #labels Featured
 
 = Most Recent/Recommended Version =
-
-  * [https://googledrive.com/host/0B1FwZagazjpcRFN2eVVxdXc5c0k/corset-1.00.tar.gz corset 1.00] - from 11th July 2014 (major improvements in memory usage over older version).
-
-
+  * <a href="https://docs.google.com/uc?export=download&id=0B1FwZagazjpcRFN2eVVxdXc5c0k"> corset 1.00 </a> - from 11th July 2014 (major improvements in memory usage over older versions).
 = Older Versions =
 
   * [https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.94.tar.gz corset 0.94] - from 8th October 2013 (minor fix)
