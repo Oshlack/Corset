@@ -1,4 +1,4 @@
-VERSION=1.00
+VERSION=1.01
 FILES=corset.cc Cluster.cc Transcript.cc MakeClusters.cc Read.cc MakeClusters.h Transcript.h Read.h StringSet.h Cluster.h 
 OBJ=corset.o Cluster.o MakeClusters.o Transcript.o Read.o
 
