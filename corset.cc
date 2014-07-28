@@ -353,7 +353,7 @@ int main(int argc, char **argv){
   //change to threads parameter later on.
   //for now we have one thread per sample
   //pthread_t thread[smpls];
-  read_bam_args thread_args[smpls];
+  read_bam_args * thread_args = new read_bam_args[smpls];
 
   for(int bam_file=0; bam_file < smpls; bam_file++){
     thread_args[bam_file].filename = string(argv[params+bam_file]);
@@ -361,7 +361,8 @@ int main(int argc, char **argv){
     thread_args[bam_file].sample = bam_file;
     rList.push_back((ReadList*)(read_bam_file(&thread_args[bam_file])));
   } //non-threads
-
+  delete [] thread_args ;
+  
   StringSet<Transcript>::iterator it;
 
   int n=0;
