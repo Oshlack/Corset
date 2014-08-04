@@ -167,6 +167,9 @@ void print_usage(){
   cout << "\t                  e.g. -n Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA etc." << endl;
   cout << "\t                  Default: the input filenames will be used." << endl;
   cout << endl;
+  cout << "Citation: Nadia M. Davidson and Alicia Oshlack, Corset: enabling differential gene expression " << endl;
+  cout << "          analysis for de novo assembled transcriptomes, Genome Biology 2014, 15:410" << endl;
+  cout << endl;
   cout << "Please see https://code.google.com/p/corset-project/ for more information"<< endl;
   cout << endl;
 }
