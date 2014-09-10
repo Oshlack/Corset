@@ -1,8 +1,9 @@
 VERSION=1.03
 FILES=corset.cc Cluster.cc Transcript.cc MakeClusters.cc Read.cc MakeClusters.h Transcript.h Read.h StringSet.h Cluster.h corset_fasta_ID_changer.cc
 OBJ=corset.o Cluster.o MakeClusters.o Transcript.o Read.o
+EX=corset corset_fasta_ID_changer
 
-all: corset corset_fasta_ID_changer Makefile
+all: $(EX) Makefile
 
 corset: $(OBJ)
 	@CXX@ @CXXFLAGS@ $(OBJ) -o $@ @LDFLAGS@ @LIBS@
@@ -17,11 +18,11 @@ clean:
 	-rm *~ $(OBJ)
 
 Clean: clean
-	-rm corset corset_fasta_ID_changer
+	-rm $(EX)
 
 install: all
-	cp corset @prefix@/bin
-	cp corset_fasta_ID_changer @prefix@/bin
+	test -d @prefix@/bin/ || mkdir @prefix@/bin/
+	cp $(EX) @prefix@/bin/
 
 tar_ball:
 	-mkdir corset-$(VERSION)

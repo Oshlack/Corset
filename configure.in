@@ -1,10 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([corset], [0.94], [<nadia.davidson@mcri.edu.au>])
+AC_INIT([corset], [1.03], [<nadia.davidson@mcri.edu.au>])
 
-# Checks for programs.
-#AC_PROG_CC
 CXXFLAGS="-O3 -ffast-math -I./ $CXXFLAGS $CPPFLAGS"
 
 AC_PROG_CXX()
@@ -15,24 +13,39 @@ AC_ARG_WITH(bam-lib, [  --with-bam_lib
                   specify the directory where the samtools libraries can be found])
 AC_ARG_WITH(bam-inc, [  --with-bam_inc
                   specify the directory where the samtools headers can be found])
+AC_ARG_WITH(htslib-dir, [  --with-htslib
+                  specify the directory where the htslib headers can be found (default is <samtools directory>/htslib-1.0) ])
 
+SAMTOOLS_INC_DIR=$with_bam_inc
+if test "$SAMTOOLS_INC_DIR" != ""
+then
+        CXXFLAGS="-I$SAMTOOLS_INC_DIR $CXXFLAGS"
+fi
+
+HTSLIB_DIR=$SAMTOOLS_INC_DIR/htslib-1.0 #default for samtools 1-0
+if test "$with_htslib" != ""
+then
+	HTSLIB_DIR=$with_htslib
+fi
+#fix because the static library doens't play nicely in mac OS X.
+AC_CHECK_FILE( [$HTSLIB_DIR/libhts.a], [
+   LIBS="$LIBS $HTSLIB_DIR/libhts.a"  &&
+   CXXFLAGS="-I$HTSLIB_DIR $CXXFLAGS" ] )
+
+SAMTOOLS_LIB_DIR=$SAMTOOLS_INC_DIR
 if test "$with_bam_lib" != ""
 then
-        LDFLAGS="-L$with_bam_lib $LDFLAGS"
-        LD_RUN_PATH="$LD_RUN_PATH:$with_bam_lib"
+	SAMTOOLS_LIB_DIR=$with_bam_lib
 fi
-
-if test "$with_bam_inc" != ""
-then
-        CXXFLAGS="-I$with_bam_inc $CXXFLAGS"
-fi
+LDFLAGS="-L$SAMTOOLS_LIB_DIR $LDFLAGS"
+LD_RUN_PATH="$LD_RUN_PATH:$SAMTOOLS_LIB_DIR"
 
 #Checks for samtools libraries and header files
-AC_CHECK_HEADER([sam.h], [], [
+AC_CHECK_HEADERS([bam.h sam.h], [], [
   echo "" &&
   echo "ERROR: Could not find the samtools headers." &&
   echo "       Please specify the location with: " &&
-  echo "       './configure --with-bam_inc=<directory_containing_sam.h> " &&
+  echo "       './configure --with-bam_inc=<directory containing sam.h, bam.h etc.> " &&
   exit -1
 ])
 
@@ -40,7 +53,7 @@ AC_CHECK_LIB([z], [main], [], [
   echo "" &&
   echo "ERROR: Could not find the samtools library, libbam." &&
   echo "       Please specify the location with: " &&
-  echo "       './configure --with-bam_lib=<directory_containing_bam_library> " &&
+  echo "       './configure --with-bam_lib=<directory containing bam library> " &&
   exit -1
 ])
 
@@ -48,11 +61,13 @@ AC_CHECK_LIB([bam], [main], [], [
   echo "" &&
   echo "ERROR: Could not find the samtools library, libbam." &&
   echo "       Please specify the location with: " &&
-  echo "       './configure --with-bam_lib=<directory_containing_bam_library> " &&
+  echo "       './configure --with-bam_lib=<directory containing bam library> " &&
   exit -1
 ])
 
+
 AC_CHECK_LIB([pthread], [main], [], [])
+
 
 AC_CONFIG_FILES([Makefile])
 
@@ -66,6 +81,5 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],[
 CXXFLAGS="$my_save_cflags"
 
 AC_SUBST(LD_RUN_PATH,$LD_RUN_PATH)
-#AC_SUBST(BASE,$PWD)
 
 AC_OUTPUT

@@ -298,7 +298,8 @@ int main(int argc, char **argv){
   if(sample_names==""){ //if the -n option (sample names) have not been 
     //specified, then use the filenames.
     for(int s = params; s < argc ; s++){
-      sample_names+=string(argv[s])+'\t';
+      sample_names+=string(argv[s]);
+      if(s < (argc-1)) sample_names+='\t';
     }
   }
   if(groups.size()==0){ // if no -g option (no groups information) is given 
