@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([corset], [1.03], [<nadia.davidson@mcri.edu.au>])
+AC_INIT([corset], [1.04], [<nadia.davidson@mcri.edu.au>])
 
 CXXFLAGS="-O3 -ffast-math -I./ $CXXFLAGS $CPPFLAGS"
 
