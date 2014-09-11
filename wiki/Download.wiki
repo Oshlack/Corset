@@ -12,5 +12,5 @@
   * corset 0.94 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.94.tar.gz source]) - from 8th October 2013 (minor fix)
   * corset 0.93 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.93.tar.gz source]) - from 27th August 2013 (bug fix)
   * corset 0.92 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.92.tar.gz source]) - from 13th August 2013 (bug fix)
-  * corset 0.91 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.91.tar.gz corset source]) - from 12th June 2013 (install fix)
+  * corset 0.91 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.91.tar.gz source]) - from 12th June 2013 (install fix)
   * corset 0.9 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-0.9.tar.gz source]) - from 30th July 2013
