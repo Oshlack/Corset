@@ -31,3 +31,9 @@ tar_ball:
 	tar -cvf corset-$(VERSION).tar corset-$(VERSION)/
 	gzip corset-$(VERSION).tar
 
+tar_ball_binary:
+	-mkdir corset-$(VERSION)-linux64
+	cp $(EX) corset-$(VERSION)-linux64
+	cp COPYING LICENSE corset-$(VERSION)-linux64
+	tar -cvf corset-$(VERSION)-linux64.tar corset-$(VERSION)-linux64/
+	gzip corset-$(VERSION)-linux64.tar
