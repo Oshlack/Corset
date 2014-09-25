@@ -4,7 +4,7 @@
 = Most Recent/Recommended Version =
 
 
-  * corset 1.03 ([https://drive.google.com/file/d/0B1FwZagazjpcbXVfbGpmUkx5bTg/edit?usp=sharing linux64 binary])([https://drive.google.com/file/d/0B1FwZagazjpcaENOeGNSTWgzRU0/edit?usp=sharing source]) - from 10th September 2014 (bug fix to allow compilation against samtools 1.0)
+  * corset 1.03 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03-linux64.tar.gz  linux64 binary])([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03.tar.gz source]) - from 10th September 2014 (bug fix to allow compilation against samtools 1.0)
 
 = Older Versions =
 
