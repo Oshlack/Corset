@@ -6,6 +6,8 @@
 
   * corset 1.03 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03-linux64.tar.gz  linux64 binary])([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03.tar.gz source]) - from 10th September 2014 (bug fix to allow compilation against samtools 1.0)
 
+For those with the Homebrew package manager for Mac OSX, you can install corset 1.02 with "brew tap homebrew/science" then "brew install corset". Thanks to Aurelien Mazurie for adding corset!
+
 = Older Versions =
 
   * corset 1.02 (<a href="https://docs.google.com/uc?export=download&id=0B1FwZagazjpcV0luTDZteHNPWXc">source</a>) - from 4th August 2014 ( bug fix for mac compilation and addition of the command corset_fasta_ID_changer for prefixing fasta file contig ids with cluster groups )
