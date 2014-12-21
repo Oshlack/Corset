@@ -3,8 +3,9 @@
 
 = Most Recent/Recommended Version =
 
+  * corset 1.04 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.04.tar.gz source]) - from 21st December 2014 (bug fix to allow compilation against samtools 1.1 and lower, otherwise identical to corset 1.03)
 
-  * corset 1.03 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03-linux64.tar.gz  linux64 binary])([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03.tar.gz source]) - from 10th September 2014 (bug fix to allow compilation against samtools 1.0)
+  * corset 1.03 ([https://googledrive.com/host/0B1FwZagazjpcc0JLZWllcFlwUXc/corset-1.03-linux64.tar.gz  linux64 binary]) - from 10th September 2014 (bug fix to allow compilation against samtools 1.0 and lower)
 
 For those with the Homebrew package manager for Mac OSX, you can install corset 1.02 with "brew tap homebrew/science" then "brew install corset". Thanks to Aurelien Mazurie for adding corset!
 
