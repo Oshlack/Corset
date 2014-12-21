@@ -22,7 +22,7 @@ then
         CXXFLAGS="-I$SAMTOOLS_INC_DIR $CXXFLAGS"
 fi
 
-HTSLIB_DIR=$SAMTOOLS_INC_DIR/htslib-1.0 #default for samtools 1-0
+HTSLIB_DIR=`echo $SAMTOOLS_INC_DIR/htslib-*.*` 
 if test "$with_htslib" != ""
 then
 	HTSLIB_DIR=$with_htslib
