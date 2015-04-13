@@ -22,7 +22,7 @@
  **     clusters and counts are output for each of these smaller groups.
  **
  ** Author: Nadia Davidson, nadia.davidson@mcri.edu.au
- ** Modified: 11 June 2013
+ ** Modified: 13 April 2015
  **/ 
 
 #include <iostream>
@@ -302,6 +302,16 @@ int main(int argc, char **argv){
       if(s < (argc-1)) sample_names+='\t';
     }
   }
+  //if the number of sample provided for the header of the counts file
+  //is inconsistent with the number of samples print an error and exit
+  int n_sample_names=count(sample_names.begin(), sample_names.end(),'\t')+1;
+  if(n_sample_names!=smpls){
+    cerr << "The number of sample names passed (via the -n option), " << n_sample_names 
+	 << ", does not match the number of samples, " << smpls
+	 << ". Please check how many values you have passed." << endl;
+    exit(1);
+  }
+
   if(groups.size()==0){ // if no -g option (no groups information) is given 
     //treat each file as a separate group
     for(int s=0; s<smpls; s++)
