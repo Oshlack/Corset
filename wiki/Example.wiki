@@ -109,16 +109,16 @@ topTags(results)
 
 Clusters of interest can then be examined further and annotated. 
 
-Adam Taranto has a written a nice python script to help with this ( [https://github.com/Adamtaranto/Corset-tools fetchClusterSeqs.py]). It will take the output for corset, the assembled fasta file and file containing a list of clusters of interest, and generate a new fasta file containing only the contigs of interest with their cluster ID appended to the contig ID.
+Adam Taranto has a written a nice python script to help with this ( [https://github.com/Adamtaranto/Corset-tools fetchClusterSeqs.py]). It will take the output for corset, the assembled fasta file and file containing a list of clusters of interest, and generate a new fasta file containing only the contigs of interest (with their cluster ID appended to the contig ID).
 
-So for example, you could output all the differentially expressed clustered found using edgeR
+So, for example, you could output all the differentially expressed clustered found using edgeR. In R:
 {{{
 allTags<-topTags(results,n=dim(results$table)[1])[[1]]
 deClusters=rownames(allTags)[allTags$FDR<0.05]
 write.table(deClusters,"clusters_of_interest.txt",quote=F,row.names=F,col.names=F)
 }}}
 
-Extract the contig sequences (assumed the python script is in the same directory)
+Extract the contig sequences (assuming the python script is in the same directory). On the command line:
 {{{
 ./fetchClusterSeqs.py -i Trinity.fasta -t clusters_of_interest.txt -o contigs_of_interest.fasta -c clusters.txt
 }}}
