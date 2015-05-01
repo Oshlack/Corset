@@ -111,10 +111,19 @@ Clusters of interest can then be examined further and annotated.
 
 Adam Taranto has a written a nice python script to help with this ( [https://github.com/Adamtaranto/Corset-tools fetchClusterSeqs.py]). It will take the output for corset, the assembled fasta file and file containing a list of clusters of interest, and generate a new fasta file containing only the contigs of interest with their cluster ID appended to the contig ID.
 
-So for example, you could output all the differentially expressed clustered found using edgeR, extract the contig sequences using fetchClusterSeqs.py and then run [http://www.blast2go.com/b2ghome blast2GO] to work out what the genes were.
+So for example, you could output all the differentially expressed clustered found using edgeR
+{{{
+allTags<-topTags(results,n=dim(results$table)[1])[[1]]
+deClusters=rownames(allTags)[allTags$FDR<0.05]
+write.table(deClusters,"clusters_of_interest.txt",quote=F,row.names=F,col.names=F)
+}}}
+
+Extract the contig sequences (assumed the python script is in the same directory)
+{{{
+./fetchClusterSeqs.py -i Trinity.fasta -t clusters_of_interest.txt -o contigs_of_interest.fasta -c clusters.txt
+}}}
+and then run [http://www.blast2go.com/b2ghome blast2GO] on the file `contigs_of_interest.fasta` to work out what the genes were.
 
 ==Bpipe Pipeline==
 
 [https://code.google.com/p/bpipe/ bpipe] is a nice tool for managing pipelines and Simon Sadedin has proved an example of running the steps above through bpipe [https://code.google.com/p/bpipe/wiki/RNASeqCorset]
-
-
