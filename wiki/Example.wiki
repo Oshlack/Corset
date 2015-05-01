@@ -122,7 +122,7 @@ Extract the contig sequences (assuming the python script is in the same director
 {{{
 ./fetchClusterSeqs.py -i Trinity.fasta -t clusters_of_interest.txt -o contigs_of_interest.fasta -c clusters.txt
 }}}
-and then run [http://www.blast2go.com/b2ghome blast2GO] on the file `contigs_of_interest.fasta` to work out what the genes were.
+and then run [https://www.blast2go.com/ blast2GO] on the file `contigs_of_interest.fasta` to work out what the genes were.
 
 ==Bpipe Pipeline==
 
