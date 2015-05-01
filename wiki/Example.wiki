@@ -105,12 +105,16 @@ topTags(results)
 }}}
 
 
-Clusters of interest can then be examined further and annotated. For example by selecting a representative transcript from each cluster and using software such as [http://www.blast2go.com/b2ghome blast2GO] to work out what the gene is.
+== Annotation ==
+
+Clusters of interest can then be examined further and annotated. 
+
+Adam Taranto has a written a nice python script to help with this ( [https://github.com/Adamtaranto/Corset-tools fetchClusterSeqs.py]). It will take the output for corset, the assembled fasta file and file containing a list of clusters of interest, and generate a new fasta file containing only the contigs of interest with their cluster ID appended to the contig ID.
+
+So for example, you could output all the differentially expressed clustered found using edgeR, extract the contig sequences using fetchClusterSeqs.py and then run [http://www.blast2go.com/b2ghome blast2GO] to work out what the genes were.
 
 ==Bpipe Pipeline==
 
 [https://code.google.com/p/bpipe/ bpipe] is a nice tool for managing pipelines and Simon Sadedin has proved an example of running the steps above through bpipe [https://code.google.com/p/bpipe/wiki/RNASeqCorset]
-
-
 
 
