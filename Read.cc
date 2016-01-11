@@ -24,13 +24,31 @@ void ReadList::add_alignment(string read, string trans, int sample){
   }
 };
 
+//This is the method called when we read corset files as input.
+//reads are already 'compact', so we can add to the read_vector instead of the map.
+void ReadList::add_alignment(vector<string> trans_names, int sample, int weight){
+  //make the new read
+  Read * r = new Read("");
+  reads_vector.push_back(r);
+  r->set_sample(sample);
+  r->set_weight(weight); //this read represents mutliple reads in the original bam
+  
+  //loop over all the transcripts that this read aligns to
+  vector<string>::iterator itrTrans = trans_names.begin();
+  for(; itrTrans!=trans_names.end(); itrTrans++){
+    //find the transcript object with the name  
+    Transcript * t = transcript_list->insert(*itrTrans);
+    r->add_alignment(t);
+  }
+};
+
 //save memory by reducing all the reads of a sample into
 //a vector of "compact reads". compact reads are stored in
 //regular read object, with a weight equal to the number
 //of regular reads. This saves a lot of RAM if reads from multiple
 //samples are processed. The map obect (StringSet) with read IDs
 //is also destroyed to save memory.
-void ReadList::compactify_reads(TranscriptList * trans){ 
+void ReadList::compactify_reads(TranscriptList * trans, string outputReadsName){ 
   // first lets sort the alignments for each read
 
   StringSet<Read>::iterator itr=reads_map->begin();
@@ -73,4 +91,20 @@ void ReadList::compactify_reads(TranscriptList * trans){
   }
   reads_map->clear();
   delete reads_map ;
+}
+
+void ReadList::write(string outputReadsName){
+  //now output the read mapping to file if requested
+  ofstream readFile;
+  readFile.open(outputReadsName);
+  vector<Read *>::iterator read;
+  for(read=begin(); read!=end(); read++){
+    readFile << (*read)->get_weight() ;
+    vector < Transcript * >::iterator trans;
+    for(trans=(*read)->align_begin(); trans!=(*read)->align_end(); trans++)
+      readFile << "\t" << (*trans)->get_name();
+    readFile << endl;
+  }
+  readFile.close();
+  cout << "Done writing "<< outputReadsName << endl;
 }

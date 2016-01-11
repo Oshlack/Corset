@@ -54,24 +54,12 @@
 
 using namespace std;
 
-// this struct is used to pass the bam file data
-// to the read_bam_file function and allows for
-// this part of the program to be threaded.
-typedef struct read_bam_arguments{
-  string filename;
-  TranscriptList * trans;
-  int sample;
-} read_bam_args ;
-
+const string corset_extension=".corset-reads";
 
 // a function to parse a bam file. It required samtools
 // to read it. The alignments are stored in a ReadList object.
-void * read_bam_file(void * args){
+ReadList * read_bam_file(string all_file_names, TranscriptList * trans, int sample){
 
-   read_bam_args * myargs = (read_bam_args *)(args);
-   TranscriptList * trans = myargs->trans;
-   string all_file_names = myargs->filename;
-   int sample = myargs->sample;
    ReadList * rList = new ReadList(trans);
    string filename;
    stringstream ss(all_file_names);
@@ -109,7 +97,38 @@ void * read_bam_file(void * args){
      cout << "Done reading "<< filename << endl;
    }
    rList->compactify_reads(trans); //reduce the memory usage
-   return (void*) rList; //return the alignment list
+   return rList; //return the alignment list
+}
+
+ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int sample){
+   ReadList * rList = new ReadList(trans);
+   string filename;
+   stringstream ss(all_file_names);
+
+   //read each file in the comma separated list
+   while(getline(ss,filename,',')){  
+     cout << "Reading corset file : "<< filename << endl;
+     //check that the filename has the correct file extension
+     //i.e. that we can't accidently pass a bam file.
+     if(filename.find(corset_extension)==string::npos ){
+       cout << "The input files don't have the extension, "<< corset_extension;
+       cout << ". Please check them." << endl;
+       exit(1);
+     }
+     ifstream file(filename);
+     string line;
+     while(getline(file, line)){
+	 istringstream istream(line);
+	 int weight;
+	 vector<string> transNames;
+	 string name;
+	 istream >> weight;
+	 while(istream >> name)
+	   transNames.push_back(name);
+	 rList->add_alignment(transNames,sample,weight);
+     }
+   } 
+   return rList;
 }
 
 // the help information which is printed when a user puts in the wrong
@@ -167,6 +186,17 @@ void print_usage(){
   cout << "\t                  e.g. -n Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA etc." << endl;
   cout << "\t                  Default: the input filenames will be used." << endl;
   cout << endl;
+  cout << "\t -r <true/false>  Output a file summarising the read alignments. This may be used if you" << endl;
+  cout << "\t                  would like to read the bam files and run the clustering in seperate runs" << endl;
+  cout << "\t                  of corset. e.g. to read input bam files in parallel. The output will be the" << endl;
+  cout << "\t                  bam filename appended with "<< corset_extension <<"." << endl;
+  cout << "\t                  Default: false" << endl;
+  cout << endl;
+  cout << "\t -i <bam/corset>  The input file type. Use -i corset, if you previously ran" << endl ;
+  cout << "\t                  corset with the -r option and would like to restart using those" << endl;
+  cout << "\t                  read summary files. Running with -i corset will switch off the -r option." << endl;
+  cout << "\t                  Default: bam" << endl;
+  cout << endl;
   cout << "Citation: Nadia M. Davidson and Alicia Oshlack, Corset: enabling differential gene expression " << endl;
   cout << "          analysis for de novo assembled transcriptomes, Genome Biology 2014, 15:410" << endl;
   cout << endl;
@@ -184,10 +214,15 @@ int main(int argc, char **argv){
   int c;
   int params=1;
   vector<int> groups;
+  bool output_reads=false;
+  string input_type="bam";
+  //function pointer to the method to read the bam or corset input files
+  ReadList * (*read_input)(string, TranscriptList *, int) = read_bam_file;
 
   cout << endl;
+
   //parse the command line options
-  while((c =  getopt(argc, argv, "f:p:d:n:g:D:m:")) != EOF){
+  while((c =  getopt(argc, argv, "f:p:d:n:g:D:m:r:i:")) != EOF){
     switch(c){
     case 'f': { //f=force output to be overwritten?
       std::string value(optarg); 
@@ -258,6 +293,36 @@ int main(int argc, char **argv){
     case 'm':{
       cout << "Setting minimum counts to "<<optarg<<endl;
       Transcript::min_counts=atoi(optarg);
+      params+=2;
+      break;
+    }
+    case 'r':{ //r=whether to output read information
+      std::string value(optarg);
+      transform(value.begin(), value.end(), value.begin(), ::tolower);
+      if( value.compare("true")==0 | value.compare("t")==0 | value.compare("1")==0 ){
+        output_reads=true;
+        cout << "Setting read alignments to be output to file."<<endl;
+      }
+      else if (value.compare("false")!=0 & value.compare("f")!=0 & value.compare("0")!=0 ){
+        cerr << "Unknown argument passed with -r. Please specify true or false." << endl;
+        print_usage();
+        exit(1);
+      }
+      params+=2;
+      break; 
+    }
+    case 'i':{
+      std::string value(optarg);
+      transform(value.begin(), value.end(), value.begin(), ::tolower);
+      if( value.compare("corset")==0 ){ 
+	read_input=read_corset_file;
+	output_reads=false; //override the -r option
+      }
+      else if(value.compare("bam")!=0 ){
+	cerr << "Unknown input type, "<< value<<", passed with -i. Please check options." << endl;
+	print_usage();
+	exit(1);
+      }
       params+=2;
       break;
     }
@@ -364,25 +429,19 @@ int main(int argc, char **argv){
   TranscriptList * tList = new TranscriptList;
   vector<ReadList*> rList; //one ReadList per sample  
 
-  //change to threads parameter later on.
-  //for now we have one thread per sample
-  //pthread_t thread[smpls];
-  read_bam_args * thread_args = new read_bam_args[smpls];
-
   for(int bam_file=0; bam_file < smpls; bam_file++){
-    thread_args[bam_file].filename = string(argv[params+bam_file]);
-    thread_args[bam_file].trans = tList;
-    thread_args[bam_file].sample = bam_file;
-    rList.push_back((ReadList*)(read_bam_file(&thread_args[bam_file])));
-  } //non-threads
-  delete [] thread_args ;
+    rList.push_back(read_input(string(argv[params+bam_file]),tList,bam_file));
+    //This is where we output the read alignment summary file for future runs of corset
+    if(output_reads)
+      rList[bam_file]->write(string(argv[params+bam_file])+corset_extension);
+  } 
   
+  //output clusters with no reads in this special case
   StringSet<Transcript>::iterator it;
-
   int n=0;
   for(it=tList->begin(); it!=tList->end(); it++){
     if(!(*it).second->reached_min_counts()){
-      if(Transcript::min_counts==0){ //output clusters with no reads in this special case
+      if(Transcript::min_counts==0){ 
 	n++;
 	//output clusters
 	for (map<float,string>::iterator dis=distance_thresholds.begin(); dis!=distance_thresholds.end(); ++dis){

@@ -20,9 +20,9 @@
 #include <sstream>
 #include <cstdlib>
 #include <algorithm>
-#include <Transcript.h>
-
+#include <fstream>
 #include <iostream>
+#include <Transcript.h>
 
 using namespace std;
 
@@ -76,16 +76,21 @@ class ReadList{
     ReadList( TranscriptList * transcripts){ transcript_list = transcripts; reads_map = new StringSet<Read> ; };
 
     //add a new alignment into the list
+    //this one is used when reading bam files
     void add_alignment(string read, string trans, int sample);
+    //this one is used when reading corset read summary files
+    void add_alignment(vector<string> trans, int sample, int weight);
 
     //saves memory by reducing each read into a set of
     //"compact reads" with a weight.
     //Also the map object is clear and the reads are
     //stored as a vector instead. Read IDs are cleared.
-    void compactify_reads(TranscriptList * trans); 
+    void compactify_reads(TranscriptList * trans, string outputReadsName=""); 
 
     vector<Read *>::iterator begin(){return reads_vector.begin();};
     vector<Read *>::iterator end(){return reads_vector.end();};
+
+    void write(string outputReadsName);
 
 };
 
