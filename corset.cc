@@ -67,6 +67,11 @@ ReadList * read_bam_file(string all_file_names, TranscriptList * trans, int samp
    //read each file in the comma separated list
    while(getline(ss,filename,',')){  
      cout << "Reading bam file : "<< filename << endl;
+     if(!(filename.find(corset_extension)==string::npos) ){
+       cout << "The input files look like corset read files (filenames with "<< corset_extension;
+       cout << "). Perhaps you meant to run with the -i corset option?" << endl;
+       exit(1);
+     }
      samfile_t *in = 0 ;
      if ((in = samopen(filename.c_str(), "br", NULL)) == 0 | in->header == 0) {
        cerr << "fail to open "<< filename << " for reading." << endl;
@@ -186,7 +191,8 @@ void print_usage(){
   cout << "\t                  e.g. -n Group1-ReplicateA,Group1-ReplicateB,Group2-ReplicateA etc." << endl;
   cout << "\t                  Default: the input filenames will be used." << endl;
   cout << endl;
-  cout << "\t -r <true/false>  Output a file summarising the read alignments. This may be used if you" << endl;
+  cout << "\t -r <true/true-stop/false> " << endl;  
+  cout << "\t                  Output a file summarising the read alignments. This may be used if you" << endl;
   cout << "\t                  would like to read the bam files and run the clustering in seperate runs" << endl;
   cout << "\t                  of corset. e.g. to read input bam files in parallel. The output will be the" << endl;
   cout << "\t                  bam filename appended with "<< corset_extension <<"." << endl;
@@ -215,6 +221,7 @@ int main(int argc, char **argv){
   int params=1;
   vector<int> groups;
   bool output_reads=false;
+  bool stop_after_read=false;
   string input_type="bam";
   //function pointer to the method to read the bam or corset input files
   ReadList * (*read_input)(string, TranscriptList *, int) = read_bam_file;
@@ -299,11 +306,17 @@ int main(int argc, char **argv){
     case 'r':{ //r=whether to output read information
       std::string value(optarg);
       transform(value.begin(), value.end(), value.begin(), ::tolower);
-      if( value.compare("true")==0 | value.compare("t")==0 | value.compare("1")==0 ){
+      if( value.compare("true-stop")==0){
+	output_reads=true;
+	stop_after_read=true;
+	cout << "Setting read alignments to be output to file." << endl;
+	cout << "Corset will exit after reading bam files." << endl;
+      }
+      else if( value.compare("true")==0 | value.compare("t")==0 ){
         output_reads=true;
         cout << "Setting read alignments to be output to file."<<endl;
       }
-      else if (value.compare("false")!=0 & value.compare("f")!=0 & value.compare("0")!=0 ){
+      else if (value.compare("false")!=0 & value.compare("f")!=0 ){
         cerr << "Unknown argument passed with -r. Please specify true or false." << endl;
         print_usage();
         exit(1);
@@ -317,6 +330,7 @@ int main(int argc, char **argv){
       if( value.compare("corset")==0 ){ 
 	read_input=read_corset_file;
 	output_reads=false; //override the -r option
+	stop_after_read=false;
       }
       else if(value.compare("bam")!=0 ){
 	cerr << "Unknown input type, "<< value<<", passed with -i. Please check options." << endl;
@@ -435,7 +449,11 @@ int main(int argc, char **argv){
     if(output_reads)
       rList[bam_file]->write(string(argv[params+bam_file])+corset_extension);
   } 
+
+  cout << "Done reading all files. "<< endl;
   
+  if(stop_after_read==true) exit(0);
+
   //output clusters with no reads in this special case
   StringSet<Transcript>::iterator it;
   int n=0;
@@ -455,7 +473,6 @@ int main(int argc, char **argv){
       (*it).second->remove();
     }
   };
-  cout << "Done reading all files. "<< endl;
 
   delete tList; //don't need this anymore, so why not free some space  
 
