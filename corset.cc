@@ -22,7 +22,7 @@
  **     clusters and counts are output for each of these smaller groups.
  **
  ** Author: Nadia Davidson, nadia.davidson@mcri.edu.au
- ** Modified: 13 April 2015
+ ** Modified: 20 January 2016
  **/ 
 
 #include <iostream>
@@ -227,6 +227,7 @@ int main(int argc, char **argv){
   ReadList * (*read_input)(string, TranscriptList *, int) = read_bam_file;
 
   cout << endl;
+  cout << "Running Corset Version "<< VERSION << endl;
 
   //parse the command line options
   while((c =  getopt(argc, argv, "f:p:d:n:g:D:m:r:i:")) != EOF){
