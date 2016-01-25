@@ -33,6 +33,8 @@ class Read{
   vector < Transcript * > alignments_;
   unsigned char sample_;
   int weight_;
+  uintptr_t trans_hash;
+
  public:
   Read(string name){ weight_=1; }; //name_=name; };
   void set_sample(int sample){sample_=sample;};
@@ -59,7 +61,31 @@ class Read{
   //this assumed that "sort_alignments" has been called first.
   //it is used in ReadList::compactify_reads
   bool has_same_alignments( Read * r);
-  
+
+  // return the hashed values of all transcript pointers that this read aligns to
+  // used to quickly compare alignments in the compactify_reads function
+  uintptr_t get_trans_hash(){
+    return trans_hash ;
+  }
+
+  // sets the hashed values of all transcript pointers that this read aligns to using xor
+  // used to quickly compare alignments in the compactify_reads function
+  uintptr_t set_trans_hash(){
+    trans_hash = 0;
+    vector < Transcript * >::iterator t_itr=align_begin();
+    for( ; t_itr!=align_end() ; t_itr++){
+      // this has function was derived from boost::hash_combine()
+      trans_hash ^= hash<uintptr_t>()((uintptr_t)(*t_itr)) + 0x9e3779b9 + (trans_hash<<6) + (trans_hash>>2);
+    }
+  }
+
+  void print_alignments(){
+    vector < Transcript * >::iterator t_itr=align_begin();
+    for( ; t_itr!=align_end() ; t_itr++)
+      cout << (*t_itr)->get_name() << " ";
+    cout << endl;
+  }
+
 };
 
 

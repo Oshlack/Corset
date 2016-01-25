@@ -7,10 +7,14 @@
 #include<Read.h>
 
 bool Read::has_same_alignments( Read * r){
-  if(r->get_sample()!=get_sample()) return false;
-  if(r->alignments()!=alignments()) return false;
-  return equal(align_begin(),align_end(),r->align_begin());
+
+  if(r->get_trans_hash()!=get_trans_hash()) return false;
+  return(r->get_sample()==get_sample());
+
+  //   return (r->get_trans_hash()==get_trans_hash()); //equal(align_begin(),align_end(),r->align_begin());
 };
+
+
 
 void ReadList::add_alignment(string read, string trans, int sample){
   //find the transcript id if it already exists:
@@ -49,16 +53,23 @@ void ReadList::add_alignment(vector<string> trans_names, int sample, int weight)
 //samples are processed. The map obect (StringSet) with read IDs
 //is also destroyed to save memory.
 void ReadList::compactify_reads(TranscriptList * trans, string outputReadsName){ 
-  // first lets sort the alignments for each read
 
+  // first lets sort the alignments for each read
+  // and calculate a hash value to be used when comparing alignments
   StringSet<Read>::iterator itr=reads_map->begin();
-  for(; itr!=reads_map->end(); itr++) itr->second->sort_alignments();
+  for(; itr!=reads_map->end(); itr++){ 
+    itr->second->sort_alignments(); 
+    itr->second->set_trans_hash();
+  }
 
   // then loop over the transcripts
+  int t=0;
   TranscriptList::iterator transItr = trans->begin();
   for(;transItr!=trans->end(); transItr++){
     vector<Read*> * reads = transItr->second->get_reads();
     int reads_size=reads->size();
+    if( reads_size > 50000) cout << t << " " << transItr->second->get_name() << "  " << reads_size << endl ;
+    t++;
     for(int i=0; i < (reads_size - 1); i++){
       if(reads->at(i)->get_weight()!=0){
 	for(int j=(i+1) ; j < reads_size ; j++){
