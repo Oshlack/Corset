@@ -32,7 +32,7 @@ void ReadList::add_alignment(string read, string trans, int sample){
 //reads are already 'compact', so we can add to the read_vector instead of the map.
 void ReadList::add_alignment(vector<string> trans_names, int sample, int weight){
   //make the new read
-  Read * r = new Read("");
+  Read * r = new Read();
   reads_vector.push_back(r);
   r->set_sample(sample);
   r->set_weight(weight); //this read represents mutliple reads in the original bam
@@ -63,13 +63,10 @@ void ReadList::compactify_reads(TranscriptList * trans, string outputReadsName){
   }
 
   // then loop over the transcripts
-  int t=0;
   TranscriptList::iterator transItr = trans->begin();
   for(;transItr!=trans->end(); transItr++){
     vector<Read*> * reads = transItr->second->get_reads();
     int reads_size=reads->size();
-    if( reads_size > 50000) cout << t << " " << transItr->second->get_name() << "  " << reads_size << endl ;
-    t++;
     for(int i=0; i < (reads_size - 1); i++){
       if(reads->at(i)->get_weight()!=0){
 	for(int j=(i+1) ; j < reads_size ; j++){
@@ -96,9 +93,6 @@ void ReadList::compactify_reads(TranscriptList * trans, string outputReadsName){
       reads_vector.push_back( r );
     else 
       delete r;
-    //      if(itr->second->alignments()>1000)
-    //        cout << "Found a read with "<<itr->second->alignments() << endl;
-    //      else
   }
   reads_map->clear();
   delete reads_map ;

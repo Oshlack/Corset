@@ -132,7 +132,7 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
 	   transNames.push_back(name);
 	 rList->add_alignment(transNames,sample,weight);
      }
-   } 
+   }
    return rList;
 }
 

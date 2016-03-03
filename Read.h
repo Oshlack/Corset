@@ -29,14 +29,14 @@ using namespace std;
 // Read is a basic container object for a read. It can record the read ID, 
 // all the transcript alignments for that read and which sample the read belongs to. 
 class Read{
-  //  string name_;
   vector < Transcript * > alignments_;
   unsigned char sample_;
   int weight_;
   uintptr_t trans_hash;
 
  public:
-  Read(string name){ weight_=1; }; //name_=name; };
+  Read(){ weight_=1; }; 
+  Read(string name){ weight_=1; }; //dummy for StringSet
   void set_sample(int sample){sample_=sample;};
   int get_sample(){return sample_;};
   int alignments(){return alignments_.size();};
