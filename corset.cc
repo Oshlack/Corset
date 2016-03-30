@@ -368,10 +368,10 @@ int main(int argc, char **argv){
   if(distance_thresholds.size()==1)
     distance_thresholds.begin()->second=""; //no suffix if only one distance cut-off
 
-  //the remaining command line arguments are names of the bam files
+  //the remaining command line arguments are names of the input files
   int smpls=argc-params;
   if(smpls==0){
-    cerr << "No bam files specified" << endl;
+    cerr << "No input files specified" << endl;
     print_usage();
     exit(1);
   }
@@ -403,7 +403,7 @@ int main(int argc, char **argv){
   //sample names for all the files
   if(groups.size()!=smpls){
     cerr << "The number of experimental groups passed (via the -g option) "
-	 << "does not match the number of input bam files. Please check how "
+	 << "does not match the number of input files. Please check how "
 	 << "many values you have passed." << endl;
     exit(1);
   }
