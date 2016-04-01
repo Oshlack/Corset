@@ -1,5 +1,5 @@
-Requirements
-------------
+Requirements (source tar-ball only )
+------------------------------------
 Corset requires samtools to be installed. Specifically it will use the 
 library files and headers, so these must be in a place that can be 
 accessed by Corset.
@@ -27,8 +27,8 @@ Running
 Type "corset" to get usage information.
 
 More help can be found on the website at:
-https://code.google.com/p/corset-project/
+https://github.com/Oshlack/Corset/wiki
 
 
 ----
-Last Modified, N. Davidson, 11 June 2013
+Last Modified, N. Davidson, 1 April 2016

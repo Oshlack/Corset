@@ -140,8 +140,6 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
 // combination of command line options.
 void print_usage(){
   cout << endl;
-  cout << "Corset Version "<< VERSION << endl;
-  cout << endl;
   cout << "Corset clusters contigs and counts reads from de novo assembled transcriptomes." << endl;
   cout << endl;
   cout << "Usage: corset [options] <input bam files>" << endl;
