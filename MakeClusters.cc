@@ -59,7 +59,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
       vector< Transcript * >::iterator tIt=r->align_begin() ;
       vector< Transcript * >::iterator tIt_end=r->align_end() ;
       
-      if(r->get_weight() >= 0 && distance(tIt,tIt_end) <= 50){
+      //     if(r->get_weight() >= 0 && distance(tIt,tIt_end) <= 50){
 	for( ; tIt != tIt_end; tIt++ ){
 	  Transcript * trans=*tIt;
 	  if(tIt==r->align_begin()){
@@ -69,7 +69,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
 	  else
 	    checkAgainstCurrentCluster(trans);
 	}
-      }
+	  //	}
       if(i % 100000 == 0)
 	cout << float(i)/float(1000000) << " million compact reads read" <<endl;
       i++;

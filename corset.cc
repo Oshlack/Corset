@@ -140,8 +140,6 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
 // combination of command line options.
 void print_usage(){
   cout << endl;
-  cout << "Corset Version "<< VERSION << endl;
-  cout << endl;
   cout << "Corset clusters contigs and counts reads from de novo assembled transcriptomes." << endl;
   cout << endl;
   cout << "Usage: corset [options] <input bam files>" << endl;
@@ -212,7 +210,7 @@ void print_usage(){
   cout << "Citation: Nadia M. Davidson and Alicia Oshlack, Corset: enabling differential gene expression " << endl;
   cout << "          analysis for de novo assembled transcriptomes, Genome Biology 2014, 15:410" << endl;
   cout << endl;
-  cout << "Please see https://code.google.com/p/corset-project/ for more information"<< endl;
+  cout << "Please see https://github.com/Oshlack/Corset/wiki for more information"<< endl;
   cout << endl;
 }
 
@@ -436,7 +434,8 @@ int main(int argc, char **argv){
     Cluster::D_cut=17.5+2.5*(groups.size()-1);      
   
   //test whether the output files already exist
-  for (map<float,string>::iterator it=distance_thresholds.begin(); it!=distance_thresholds.end(); ++it){
+  for (map<float,string>::iterator it=distance_thresholds.begin(); 
+       stop_after_read==false & it!=distance_thresholds.end(); ++it){
     string type[]={Cluster::file_counts,Cluster::file_clusters};
     for(int t=0; t < 2; t++){
       string filename(Cluster::file_prefix+type[t]+it->second+Cluster::file_ext);
@@ -470,8 +469,11 @@ int main(int argc, char **argv){
   for(int bam_file=0; bam_file < smpls; bam_file++){
     rList.push_back(read_input(string(argv[params+bam_file]),tList,bam_file));
     //This is where we output the read alignment summary file for future runs of corset
-    if(output_reads)
-      rList[bam_file]->write(string(argv[params+bam_file])+corset_extension);
+    if(output_reads){
+      string bam_filename = string(argv[params+bam_file]) ;
+      string base_filename = bam_filename.substr(bam_filename.find_last_of("/\\") + 1) ;
+      rList[bam_file]->write(base_filename+corset_extension);
+    }
   } 
 
   cout << "Done reading all files. "<< endl;
