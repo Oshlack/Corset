@@ -122,16 +122,28 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
      }
      ifstream file(filename);
      string line;
+     int reads_counted=0;
+     int reads_filtered=0;
      while(getline(file, line)){
 	 istringstream istream(line);
 	 int weight;
 	 vector<string> transNames;
 	 string name;
+	 int alignments=-1; //start at -1 because first column is weight
 	 istream >> weight;
-	 while(istream >> name)
-	   transNames.push_back(name);
-	 rList->add_alignment(transNames,sample,weight);
+	 if(Transcript::max_alignments>=0){ // workout the number of alignments
+	   istringstream tempstream(line);
+	   while(tempstream >> name) alignments++;
+	 } //check that number of alignments and supporting reads is okay
+	 if(weight>=Transcript::min_reads_for_link &
+	    alignments<=Transcript::max_alignments){
+	   reads_counted+=weight;
+	   while(istream >> name)
+	     transNames.push_back(name);
+	   rList->add_alignment(transNames,sample,weight); //add 
+	 } else {reads_filtered+=weight; }
      }
+     cout<<reads_counted<< " reads counted, "<<reads_filtered<<" reads filtered."<<endl;
    }
    return rList;
 }
@@ -202,10 +214,10 @@ void print_usage(){
   cout << "\t                  Default: bam" << endl;
   cout << endl;
   cout << "\t -l <int>         If running with -i corset, this will filter out a link between contigs" << endl;
-  cout << "\t                  if the link is supported by less than this many reads. Default: 1 (no filtering)" ;
+  cout << "\t                  if the link is supported by less than this many reads. Default: 1 (no filtering)" << endl;
   cout << endl;
   cout << "\t -x <int>         If running with -i corset, this option will filter out reads that align to more" << endl;
-  cout << "\t                  than x contigs. Default: no filtering" ;
+  cout << "\t                  than x contigs. Default: no filtering" << endl;
   cout << endl;
   cout << "Citation: Nadia M. Davidson and Alicia Oshlack, Corset: enabling differential gene expression " << endl;
   cout << "          analysis for de novo assembled transcriptomes, Genome Biology 2014, 15:410" << endl;
@@ -227,8 +239,6 @@ int main(int argc, char **argv){
   bool output_reads=false;
   bool stop_after_read=false;
   string input_type="bam";
-  int min_reads_for_link=1;
-  int max_alignments=-1;
 
   //function pointer to the method to read the bam or corset input files
   ReadList * (*read_input)(string, TranscriptList *, int) = read_bam_file;
@@ -351,14 +361,14 @@ int main(int argc, char **argv){
     case 'l':{
       cout << "Setting minimum reads for a link to "<<optarg
 	   << " (only used if -i is set to corset)" << endl;
-      min_reads_for_link=atoi(optarg);
+      Transcript::min_reads_for_link=atoi(optarg);
       params+=2;
       break;
     }
     case 'x':{
       cout << "Setting maximum alignments for a read to "<<optarg
 	   << " (only used if -i is set to corset)" << endl;
-      max_alignments=atoi(optarg);
+      Transcript::max_alignments=atoi(optarg);
       params+=2;
       break;
     }

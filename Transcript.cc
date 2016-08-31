@@ -20,6 +20,8 @@ using namespace std;
 int Transcript::samples=0;
 int Transcript::groups=0;
 int Transcript::min_counts=10;
+int Transcript::min_reads_for_link=1;
+int Transcript::max_alignments=-1;
 
 void Transcript::remove(){
     for(int r=0; r<reads_.size() ; r++)

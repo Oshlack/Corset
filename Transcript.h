@@ -51,6 +51,8 @@ class Transcript{
   static int samples;
   static int groups;
   static int min_counts;
+  static int min_reads_for_link;
+  static int max_alignments;
 
   vector<Read*> * get_reads(){ return &reads_ ; } ;
 };
