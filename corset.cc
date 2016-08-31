@@ -203,6 +203,12 @@ void print_usage(){
   cout << "\t                  read summary files. Running with -i corset will switch off the -r option." << endl;
   cout << "\t                  Default: bam" << endl;
   cout << endl;
+  cout << "\t -l <int>         If running with -i corset, this will filter out a link between contigs" << endl;
+  cout << "\t                  if the link is supported by less than this many reads. Default: 1 (no filtering)" ;
+  cout << endl;
+  cout << "\t -x <int>         If running with -i corset, this option will filter out reads that align to more" << endl;
+  cout << "\t                  than x contigs. Default: no filtering" ;
+  cout << endl;
   cout << "Citation: Nadia M. Davidson and Alicia Oshlack, Corset: enabling differential gene expression " << endl;
   cout << "          analysis for de novo assembled transcriptomes, Genome Biology 2014, 15:410" << endl;
   cout << endl;
@@ -223,6 +229,9 @@ int main(int argc, char **argv){
   bool output_reads=false;
   bool stop_after_read=false;
   string input_type="bam";
+  int min_reads_for_link=1;
+  int max_alignments=-1;
+
   //function pointer to the method to read the bam or corset input files
   ReadList * (*read_input)(string, TranscriptList *, int) = read_bam_file;
 
@@ -230,7 +239,7 @@ int main(int argc, char **argv){
   cout << "Running Corset Version "<< VERSION << endl;
 
   //parse the command line options
-  while((c =  getopt(argc, argv, "f:p:d:n:g:D:m:r:i:")) != EOF){
+  while((c =  getopt(argc, argv, "f:p:d:n:g:D:m:r:i:l:x:")) != EOF){
     switch(c){
     case 'f': { //f=force output to be overwritten?
       std::string value(optarg); 
@@ -338,6 +347,20 @@ int main(int argc, char **argv){
 	print_usage();
 	exit(1);
       }
+      params+=2;
+      break;
+    }
+    case 'l':{
+      cout << "Setting minimum reads for a link to "<<optarg
+	   << " (only used if -i is set to corset)" << endl;
+      min_reads_for_link=atoi(optarg);
+      params+=2;
+      break;
+    }
+    case 'x':{
+      cout << "Setting maximum alignments for a read to "<<optarg
+	   << " (only used if -i is set to corset)" << endl;
+      max_alignments=atoi(optarg);
       params+=2;
       break;
     }
