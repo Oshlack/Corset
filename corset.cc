@@ -105,6 +105,57 @@ ReadList * read_bam_file(string all_file_names, TranscriptList * trans, int samp
    return rList; //return the alignment list
 }
 
+// a function to parse a fasta file and k-mers to cluster
+ReadList * read_fasta_file(string all_file_names, TranscriptList * trans, int sample){
+
+   ReadList * rList = new ReadList(trans);
+   string filename;
+   stringstream ss(all_file_names);
+   ifstream file;
+   string line;
+
+   //read each file in the comma separated list
+   while(getline(ss,filename,',')){  
+     cout << "Reading fasta file : "<< filename << endl;
+
+     //now open the fasta file
+     file.open(filename);
+     if(!(file.good())){
+       cout << "Unable to open file " << filename << endl;
+       exit(1);
+     }
+     map<string,string> sequences;
+     string id="";
+     while ( getline (file,line) ){
+       int start=line.find(">")+1;
+       if(start==1){ //if this is the ID line...
+	 int end=line.find_first_of("\t\n ")-1;
+	 id=line.substr(start,end);
+       } else {
+	 sequences[id]=sequences[id]+line;
+       }
+     }
+     cout << "Done reading file, getting k-mers" << endl;
+     map<string,string>::iterator it=sequences.begin();
+     map<string,string>::iterator it_end=sequences.end();
+     int k=70;
+     int t_count=1;
+     for(;it!=it_end; it++, t_count++){
+       if(t_count % 1000 == 0) //output some info about how it's proceeding.
+         cout << float(t_count)/float(1000) << " thousand contigs read" <<endl;
+       string seq = it->second;
+       trans->insert(it->first);
+       for(int i=0; i <= seq.length()-k ; i++){
+	 string kmer=seq.substr(i,k) ;
+	 rList->add_alignment(kmer,it->first,sample);
+       }
+     }
+     cout << "Done reading "<< filename << endl;
+   }
+   rList->compactify_reads(trans); //reduce the memory usage
+   return rList; //return the alignment list
+}
+
 ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int sample){
    ReadList * rList = new ReadList(trans);
    string filename;
@@ -350,7 +401,10 @@ int main(int argc, char **argv){
 	output_reads=false; //override the -r option
 	stop_after_read=false;
       }
-      else if(value.compare("bam")!=0 ){
+      else if(value.compare("fasta")==0 ){
+	read_input=read_fasta_file;
+      }
+      else if(value.compare("bam")!=0 && value.compare("fasta")!=0){
 	cerr << "Unknown input type, "<< value<<", passed with -i. Please check options." << endl;
 	print_usage();
 	exit(1);
@@ -481,7 +535,7 @@ int main(int argc, char **argv){
     //This is where we output the read alignment summary file for future runs of corset
     if(output_reads){
       string bam_filename = string(argv[params+bam_file]) ;
-      string base_filename = bam_filename.substr(bam_filename.find_last_of("/\\") + 1) ;
+      string base_filename = bam_filename.substr(bam_filename.find_last_of("/\\,") + 1) ;
       rList[bam_file]->write(base_filename+corset_extension);
     }
   } 
