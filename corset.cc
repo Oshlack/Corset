@@ -199,6 +199,52 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
    return rList;
 }
 
+// Process a salom equivalence class file
+// This has the same information as a corset-reads file
+ReadList * read_salmon_eq_classes_file(string all_file_names, TranscriptList * trans, int sample){
+  ReadList * rList = new ReadList(trans);
+  string filename;
+  stringstream ss(all_file_names);
+  //read each file in the comma separated list
+  while(getline(ss,filename,',')){
+    cout << "Reading salmon eq_classes file : "<< filename << endl;
+    ifstream file(filename);
+    string line;
+    int reads_counted=0;
+    int reads_filtered=0;
+    //First read the header information with the transcript IDs
+    getline(file, line); int ntranscripts=atoi(line.c_str()) ;
+    getline(file, line); int neqclasses=atoi(line.c_str()) ;
+    cout << "Reading data on " << ntranscripts << " transcripts in " << neqclasses << " equivalence classes" << endl;
+    vector<string> trans_ids;
+    for(int nt=0; nt < ntranscripts ; nt++){
+      getline(file, line);
+      trans_ids.push_back(line);
+    }
+    //Now read the equivalence class information
+    for(int ne=0; ne < neqclasses ; ne++){
+      vector<string> transNames;
+      getline(file, line);
+      istringstream istream(line);
+      int eq_size; istream >> eq_size ;
+      for(int es=0; es < eq_size ; es++){
+	int trans_pos; istream >> trans_pos ;
+	transNames.push_back(trans_ids.at(trans_pos));
+      }
+      int weight;
+      istream >> weight;
+      if(weight>=Transcript::min_reads_for_link &
+         (eq_size<=Transcript::max_alignments || Transcript::max_alignments<=0) ){
+        reads_counted+=weight;
+        rList->add_alignment(transNames,sample,weight);
+      } else {reads_filtered+=weight; } 
+    }     
+    cout<<reads_counted<< " reads counted, "<<reads_filtered<<" reads filtered."<<endl;
+  }
+  return rList;
+}
+
+
 // the help information which is printed when a user puts in the wrong
 // combination of command line options.
 void print_usage(){
@@ -259,16 +305,18 @@ void print_usage(){
   cout << "\t                  bam filename appended with "<< corset_extension <<"." << endl;
   cout << "\t                  Default: false" << endl;
   cout << endl;
-  cout << "\t -i <bam/corset>  The input file type. Use -i corset, if you previously ran" << endl ;
+  cout << "\t -i <bam/corset/salmon_eq_classes>  The input file type. Use -i corset, if you previously ran" << endl ;
   cout << "\t                  corset with the -r option and would like to restart using those" << endl;
-  cout << "\t                  read summary files. Running with -i corset will switch off the -r option." << endl;
+  cout << "\t                  read summary files. Use salmon_eq_classes, if you aligned with salmon with" << endl;
+  cout << "\t                  the flag --dumpEq and are passing corset the equivalent class files." << endl;
+  cout << "\t                  Running with either -i corset or salmon_eq_classes will switch off the -r option." << endl;
   cout << "\t                  Default: bam" << endl;
   cout << endl;
-  cout << "\t -l <int>         If running with -i corset, this will filter out a link between contigs" << endl;
+  cout << "\t -l <int>         If running with -i corset or salmon_eq_classes, this will filter out a link between contigs" << endl;
   cout << "\t                  if the link is supported by less than this many reads. Default: 1 (no filtering)" << endl;
   cout << endl;
-  cout << "\t -x <int>         If running with -i corset, this option will filter out reads that align to more" << endl;
-  cout << "\t                  than x contigs. Default: no filtering" << endl;
+  cout << "\t -x <int>         If running with -i corset or salmon_eq_classes, this option will filter out reads that" << endl;
+  cout << "\t                  align to more than x contigs. Default: no filtering" << endl;
   cout << endl;
   cout << "Citation: Nadia M. Davidson and Alicia Oshlack, Corset: enabling differential gene expression " << endl;
   cout << "          analysis for de novo assembled transcriptomes, Genome Biology 2014, 15:410" << endl;
@@ -400,6 +448,10 @@ int main(int argc, char **argv){
 	read_input=read_corset_file;
 	output_reads=false; //override the -r option
 	stop_after_read=false;
+      } else if( value.compare("salmon_eq_classes")==0 ){
+	read_input=read_salmon_eq_classes_file;
+	output_reads=false;
+	stop_after_read=false;
       }
       else if(value.compare("fasta")==0 ){
 	read_input=read_fasta_file;
@@ -421,7 +473,7 @@ int main(int argc, char **argv){
     }
     case 'x':{
       cout << "Setting maximum alignments for a read to "<<optarg
-	   << " (only used if -i is set to corset)" << endl;
+	   << " (only used if -i is set to corset or salmon_eq_classes )" << endl;
       Transcript::max_alignments=atoi(optarg);
       params+=2;
       break;
