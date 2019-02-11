@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([corset], [1.07], [<nadia.davidson@mcri.edu.au>])
+AC_INIT([corset], [1.08], [<nadia.davidson@mcri.edu.au>])
 
 CXXFLAGS="-O3 -ffast-math -I./ $CXXFLAGS $CPPFLAGS"
 
@@ -13,8 +13,8 @@ AC_ARG_WITH(bam-lib, [  --with-bam_lib
                   specify the directory where the samtools libraries can be found])
 AC_ARG_WITH(bam-inc, [  --with-bam_inc
                   specify the directory where the samtools headers can be found])
-AC_ARG_WITH(htslib-dir, [  --with-htslib
-                  specify the directory where the htslib headers can be found (default is <samtools directory>/htslib-1.0) ])
+AC_ARG_WITH(htslib-dir, [  --with-htslib_dir
+                  specify the directory where the htslib headers and library can be found (default is <samtools directory>/htslib-*.*) ])
 
 SAMTOOLS_INC_DIR=$with_bam_inc
 if test "$SAMTOOLS_INC_DIR" != ""
@@ -23,9 +23,9 @@ then
 fi
 
 HTSLIB_DIR=`echo $SAMTOOLS_INC_DIR/htslib-*.*` 
-if test "$with_htslib" != ""
+if test "$with_htslib_dir" != ""
 then
-	HTSLIB_DIR=$with_htslib
+	HTSLIB_DIR=$with_htslib_dir
 fi
 #fix because the static library doens't play nicely in mac OS X.
 AC_CHECK_FILE( [$HTSLIB_DIR/libhts.a], [
@@ -38,7 +38,7 @@ then
 	SAMTOOLS_LIB_DIR=$with_bam_lib
 fi
 LDFLAGS="-L$SAMTOOLS_LIB_DIR $LDFLAGS"
-LD_RUN_PATH="$LD_RUN_PATH:$SAMTOOLS_LIB_DIR"
+LD_RUN_PATH="$SAMTOOLS_LIB_DIR:$LD_RUN_PATH"
 
 #Checks for samtools libraries and header files
 AC_CHECK_HEADERS([bam.h sam.h], [], [
@@ -66,8 +66,11 @@ AC_CHECK_LIB([bam], [main], [], [
 ])
 
 
-AC_CHECK_LIB([pthread], [main], [], [])
+AC_CHECK_LIB([lzma], [main], [], [])
+AC_CHECK_LIB([curl], [main], [], [])
+AC_CHECK_LIB([bz2], [main], [], [])
 
+#AC_CHECK_LIB([pthread], [main], [], [])
 
 AC_CONFIG_FILES([Makefile])
 
