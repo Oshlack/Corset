@@ -33,6 +33,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <climits>
 #include <map>
 //#include <pthread.h>
 
@@ -277,6 +278,12 @@ void print_usage(){
   cout << "\t                  approximately to a p-value threshold of 10^-5, when there are fewer than" << endl;
   cout << "\t                  10 groups." << endl;
   cout << endl;
+  cout << "\t -I               Switches off the log likelihood ratio test and should be used " << endl;
+  cout << "\t                  for downstream differential transcript usage analysis. It will prevent " << endl;
+  cout << "\t                  differentially expressed transcript being split into different clusters. " << endl;
+  cout << "\t                  This option is the equivalent of setting -D to a very large number.  " << endl;
+  cout << "\t                  Default: log likelihood ratio test on" << endl;
+  cout << endl;
   cout << "\t -m <int>         Filter out any transcripts with fewer than this many reads aligning." << endl;
   cout << "\t                  Default: 10" << endl;
   cout << endl;
@@ -346,7 +353,7 @@ int main(int argc, char **argv){
   cout << "Running Corset Version "<< VERSION << endl;
 
   //parse the command line options
-  while((c =  getopt(argc, argv, "f:p:d:n:g:D:m:r:i:l:x:")) != EOF){
+  while((c =  getopt(argc, argv, "f:p:d:n:g:D:I:m:r:i:l:x:")) != EOF){
     switch(c){
     case 'f': { //f=force output to be overwritten?
       std::string value(optarg); 
@@ -373,7 +380,7 @@ int main(int argc, char **argv){
       cout << "Setting distance threshold to: " << optarg << endl;
       distance_string = optarg;
       params+=2;
-      break; 
+      break;
     case 'n':{ //names to give the samples in the output files
       cout << "Setting sample names to:" << optarg << endl;
       sample_names=string(optarg);
@@ -414,6 +421,11 @@ int main(int argc, char **argv){
       params+=2;
       break;
     }
+    case 'I' :
+      cout << "Switching likelihood test off  - will not separate differentially expressed isoforms" << endl;
+      Cluster::D_cut=INT_MAX;
+      params+=1;
+      break;
     case 'm':{
       cout << "Setting minimum counts to "<<optarg<<endl;
       Transcript::min_counts=atoi(optarg);
