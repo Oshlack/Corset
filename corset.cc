@@ -353,7 +353,7 @@ int main(int argc, char **argv){
   cout << "Running Corset Version "<< VERSION << endl;
 
   //parse the command line options
-  while((c =  getopt(argc, argv, "f:p:d:n:g:D:I:m:r:i:l:x:")) != EOF){
+  while((c =  getopt(argc, argv, "f:p:d:n:g:D:Im:r:i:l:x:")) != EOF){
     switch(c){
     case 'f': { //f=force output to be overwritten?
       std::string value(optarg); 
@@ -421,11 +421,12 @@ int main(int argc, char **argv){
       params+=2;
       break;
     }
-    case 'I' :
+    case 'I':{
       cout << "Switching likelihood test off  - will not separate differentially expressed isoforms" << endl;
       Cluster::D_cut=INT_MAX;
       params+=1;
       break;
+    }
     case 'm':{
       cout << "Setting minimum counts to "<<optarg<<endl;
       Transcript::min_counts=atoi(optarg);
