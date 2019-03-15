@@ -20,6 +20,8 @@
 #ifndef ONECLUSTER_H
 #define ONECLUSTER_H
 
+//#include <boost/numeric/ublas/matrix_sparse.hpp>
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -28,12 +30,44 @@
 #include <cstdlib>
 #include <algorithm>
 #include <map>
+#include <climits>
 #include <Read.h>
 
 using namespace std;
 
 typedef vector < vector < int > > group;
 typedef vector < vector < vector < int > > > read_group;
+
+#ifndef UNORDEREDMAP
+  typedef map< uint64_t, unsigned char > dist_map;
+  typedef map< uint64_t, unsigned char >::iterator dist_iterator;
+#else
+  typedef unordered_map< uint64_t, unsigned char > dist_map;
+  typedef unordered_map< uint64_t, unsigned char >::iterator dist_iterator;
+#endif
+
+class DistanceMatrix {
+ private:
+  dist_map dist_;
+  uint64_t ntrans_;
+ public:
+  void set_size(int ntrans){ ntrans_=ntrans; };
+  unsigned char get(int i, int j){ return(dist_[ntrans_*i+j]); } ;
+  void set(int i, int j, int value){ 
+    if(value!=0)
+      dist_[ntrans_*i+j]=value; 
+    else
+      remove(i,j);
+  };
+  bool no_link(int i, int j){ return (dist_.find(ntrans_*i+j)==dist_.end());};
+  int get_i(uint64_t key){ return(key / ntrans_); };
+  int get_j(uint64_t key){ return(key % ntrans_); };
+  dist_iterator begin(){ return(dist_.begin()); };
+  dist_iterator end(){ return(dist_.end()); };
+  void remove(int i, int j){
+    dist_.erase(ntrans_*i+j);  
+  };
+};
 
 class Cluster {
 
@@ -52,17 +86,20 @@ class Cluster {
      //since the dist array is updated using the reads and not from the
      //current dist array. This implementation saves lots of memory when the
      //array is large.
-     unsigned char ** dist; 
+     //unsigned char ** dist; 
+     //boost::numeric::ublas::compressed_matrix<unsigned char> dist;
+     DistanceMatrix dist;
+     //unordered_map<int, unordered_map<int, unsigned char >> dist;
 
      int id_;
      vector<int> sample_groups;
 
      // a flag for whether is the minimum distance found still zero?
-     bool zero_dist_done;
+     //bool zero_dist_done;
      // variable below holds the corrdinates in dist for the last minimum found
      // (only used if the last found was a zero).
-     int zero_dist_i;
-     int zero_dist_j;
+     //int zero_dist_i;
+     //int zero_dist_j;
 
      //private methods called from "cluster"
      
@@ -83,20 +120,18 @@ class Cluster {
       ** the next smalled distance value. i.e. the next two pairs of 
       ** clusters to be merged together (returned as max_i and max_j)
       **/
-     unsigned char find_next_pair(int n, int & max_i, int & max_j);
+     unsigned char find_next_pair(int & max_i, int & max_j);
 
      /** the merge method takes two clusters (at position i and j in
       ** the distance matrx) and will merge them together. This involves
       ** merging their list of reads together, recalculating distance
       ** based on the new allocation of reads and updating the distance matrix.
       **/
-     void merge(int i, int j, int n);
+     void merge(int i, int j);
 
      /** Before starting to cluster all transcripts are allocated to
       ** either own cluster, and the distance matrix is set-up */
      void initialise_matrix();
-
-     void clean_up();
 
      /** get_counts will work out how many reads have been allocated to
       ** each cluster given the current configuration of clusters. */
@@ -130,7 +165,7 @@ class Cluster {
       **/
      void cluster(map < float, string > & thresholds);
 
-     const static unsigned char distMAX;
+     //     const static unsigned char distMAX;
      static float D_cut;
      static string file_prefix;
      const static string file_counts;
