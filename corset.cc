@@ -560,7 +560,7 @@ int main(int argc, char **argv){
 
   //if D was not set, then set the default value
   if(Cluster::D_cut==0)
-    Cluster::D_cut=17.5+2.5*(groups.size()-1);      
+    Cluster::D_cut=17.5+2.5*(Transcript::groups-1);      
   
   //test whether the output files already exist
   for (map<float,string>::iterator it=distance_thresholds.begin(); 
