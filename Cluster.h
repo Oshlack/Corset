@@ -46,6 +46,7 @@ typedef vector < vector < vector < int > > > read_group;
   typedef unordered_map< uint64_t, unsigned char >::iterator dist_iterator;
 #endif
 
+/** class to hold the distance between contigs / clusters **/
 class DistanceMatrix {
  private:
   dist_map dist_;
@@ -86,10 +87,7 @@ class Cluster {
      //since the dist array is updated using the reads and not from the
      //current dist array. This implementation saves lots of memory when the
      //array is large.
-     //unsigned char ** dist; 
-     //boost::numeric::ublas::compressed_matrix<unsigned char> dist;
      DistanceMatrix dist;
-     //unordered_map<int, unordered_map<int, unsigned char >> dist;
 
      int id_;
      vector<int> sample_groups;
@@ -123,7 +121,7 @@ class Cluster {
      unsigned char find_next_pair(int & max_i, int & max_j);
 
      /** the merge method takes two clusters (at position i and j in
-      ** the distance matrx) and will merge them together. This involves
+      ** the distance matrix) and will merge them together. This involves
       ** merging their list of reads together, recalculating distance
       ** based on the new allocation of reads and updating the distance matrix.
       **/

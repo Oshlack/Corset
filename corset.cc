@@ -213,6 +213,7 @@ ReadList * read_salmon_eq_classes_file(string all_file_names, TranscriptList * t
     string line;
     int reads_counted=0;
     int reads_filtered=0;
+    int reads_redistributed=0;
     //First read the header information with the transcript IDs
     getline(file, line); int ntranscripts=atoi(line.c_str()) ;
     getline(file, line); int neqclasses=atoi(line.c_str()) ;
@@ -234,13 +235,25 @@ ReadList * read_salmon_eq_classes_file(string all_file_names, TranscriptList * t
       }
       int weight;
       istream >> weight;
-      if(weight>=Transcript::min_reads_for_link &
-         (eq_size<=Transcript::max_alignments || Transcript::max_alignments<=0) ){
-        reads_counted+=weight;
-        rList->add_alignment(transNames,sample,weight);
-      } else {reads_filtered+=weight; } 
-    }     
-    cout<<reads_counted<< " reads counted, "<<reads_filtered<<" reads filtered."<<endl;
+      //case that the number of reads is smaller than threshold for a link b/n transcripts
+      if(weight<Transcript::min_reads_for_link){
+	//randomly select a transcript to dump the reads to
+	string randName = transNames.at(rand() % transNames.size());
+	vector<string> randTran;
+	randTran.push_back(randName);
+	rList->add_alignment(randTran,sample,weight);
+	reads_redistributed+=weight;
+      }
+      else if(eq_size<=Transcript::max_alignments || Transcript::max_alignments<=0){
+	rList->add_alignment(transNames,sample,weight);
+	reads_counted+=weight;
+      }
+      else { reads_filtered+=weight; }     
+    }
+    cout<<reads_counted<< " reads counted, "
+	<<reads_filtered<<" reads filtered, "
+	<<reads_redistributed<<" reads redistributed."
+	<<endl;
   }
   return rList;
 }
@@ -320,7 +333,9 @@ void print_usage(){
   cout << "\t                  Default: bam" << endl;
   cout << endl;
   cout << "\t -l <int>         If running with -i corset or salmon_eq_classes, this will filter out a link between contigs" << endl;
-  cout << "\t                  if the link is supported by less than this many reads. Default: 1 (no filtering)" << endl;
+  cout << "\t                  if the link is supported by less than this many reads (performed sample-wise). Reads will " << endl; 
+  cout << "\t                  be randomly reassigned to one of the contigs in the equivalence class." << endl;
+  cout << "\t                  Default: 1 (no filtering)" << endl;
   cout << endl;
   cout << "\t -x <int>         If running with -i corset or salmon_eq_classes, this option will filter out reads that" << endl;
   cout << "\t                  align to more than x contigs. Default: no filtering" << endl;
@@ -479,7 +494,7 @@ int main(int argc, char **argv){
     }
     case 'l':{
       cout << "Setting minimum reads for a link to "<<optarg
-	   << " (only used if -i is set to corset)" << endl;
+	   << " (only used if -i is set to corset or salmon_eq_classes)" << endl;
       Transcript::min_reads_for_link=atoi(optarg);
       params+=2;
       break;

@@ -39,7 +39,6 @@ void print(vector<int> x){
   cout << endl;
 }
 
-
 float Cluster::get_dist(int i, int j ){
 
   //first, work out how many shared reads we have
@@ -80,7 +79,7 @@ float Cluster::get_dist(int i, int j ){
   // if the distance is already at the maximum.
   if(shared_reads_distance==0)
     return shared_reads_distance; 
-  
+
   //now look to see if there is different differential expression between
   //samples which would suggest that the two transcripts do not belong to the
   //same gene.
@@ -365,7 +364,7 @@ void Cluster::initialise_matrix(){
       read_group_sizes.at(i).at(sample)+=(read->get_weight());  
     }
   }
-  
+
   groups.resize(n_trans());
   for(int n=0; n < n_trans(); n++)
     groups.at(n).push_back(n);
