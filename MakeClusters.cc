@@ -71,7 +71,7 @@ void MakeClusters::makeSuperClusters(vector<ReadList*> & readLists){
 	}
 	  //	}
       if(i % 100000 == 0)
-	cout << float(i)/float(1000000) << " million compact reads read" <<endl;
+	cout << float(i)/float(1000000) << " million equivalence classes read" <<endl;
       i++;
     }
     delete readLists.at(sample);

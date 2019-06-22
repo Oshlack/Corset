@@ -22,7 +22,7 @@
  **     clusters and counts are output for each of these smaller groups.
  **
  ** Author: Nadia Davidson, nadia.davidson@mcri.edu.au
- ** Modified: 20 January 2016
+ ** Modified: 22 June 2019
  **/ 
 
 #include <iostream>

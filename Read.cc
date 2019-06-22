@@ -11,7 +11,6 @@ bool Read::has_same_alignments( Read * r){
   if(r->get_trans_hash()!=get_trans_hash()) return false;
   return(r->get_sample()==get_sample());
 
-  //   return (r->get_trans_hash()==get_trans_hash()); //equal(align_begin(),align_end(),r->align_begin());
 };
 
 
@@ -28,9 +27,10 @@ void ReadList::add_alignment(string read, string trans, int sample){
   }
 };
 
-//This is the method called when we read corset files as input.
+//This is the method called when we read equivalence class files as input.
 //reads are already 'compact', so we can add to the read_vector instead of the map.
 void ReadList::add_alignment(vector<string> trans_names, int sample, int weight){
+
   //make the new read
   Read * r = new Read();
   reads_vector.push_back(r);
