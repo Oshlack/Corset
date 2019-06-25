@@ -22,7 +22,7 @@
  **     clusters and counts are output for each of these smaller groups.
  **
  ** Author: Nadia Davidson, nadia.davidson@mcri.edu.au
- ** Modified: 22 June 2019
+ ** Modified: 25 June 2019
  **/ 
 
 #include <iostream>
@@ -56,6 +56,7 @@
 using namespace std;
 
 const string corset_extension=".corset-reads";
+
 
 // a function to parse a bam file. It required samtools
 // to read it. The alignments are stored in a ReadList object.
@@ -157,6 +158,35 @@ ReadList * read_fasta_file(string all_file_names, TranscriptList * trans, int sa
    return rList; //return the alignment list
 }
 
+
+#define READS_REDISTRIBUTED 0
+#define READS_COUNTED 1
+#define READS_FILTERED 2
+
+/** Code to add an EC into the readList. This code is common to corset and
+    salmon EC file parsing **/
+int add_equivalence_class(ReadList * rList, int & sample, vector<string> & transNames, int & weight) {
+  //case that the number of reads is smaller than threshold for a link b/n transcripts
+  if(weight<Transcript::min_reads_for_link){
+    shuffle(transNames.begin(),transNames.end(),default_random_engine());
+    for(int rr=0; rr < transNames.size() ; rr++){
+      int this_weight = weight/transNames.size();
+      if(rr < (weight%transNames.size()) )
+	this_weight++;
+      vector<string> this_tran;
+      this_tran.push_back(transNames.at(rr));
+      rList->add_alignment(this_tran,sample,this_weight);
+    }
+    return READS_REDISTRIBUTED;
+  }
+  else if(transNames.size()<=Transcript::max_alignments || Transcript::max_alignments<=0){
+    rList->add_alignment(transNames,sample,weight);
+    return READS_COUNTED;
+  }
+  return READS_FILTERED;
+}
+
+/** Process a corset format equivalence class file **/
 ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int sample){
    ReadList * rList = new ReadList(trans);
    string filename;
@@ -176,6 +206,7 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
      string line;
      int reads_counted=0;
      int reads_filtered=0;
+     int reads_redistributed=0;
      while(getline(file, line)){
 	 istringstream istream(line);
 	 int weight;
@@ -183,19 +214,19 @@ ReadList * read_corset_file(string all_file_names, TranscriptList * trans, int s
 	 string name;
 	 int alignments=-1; //start at -1 because first column is weight
 	 istream >> weight;
-	 if(Transcript::max_alignments>=0){ // workout the number of alignments
-	   istringstream tempstream(line);
-	   while(tempstream >> name) alignments++;
-	 } //check that number of alignments and supporting reads is okay
-	 if(weight>=Transcript::min_reads_for_link &
-	    alignments<=Transcript::max_alignments){
-	   reads_counted+=weight;
-	   while(istream >> name)
-	     transNames.push_back(name);
-	   rList->add_alignment(transNames,sample,weight); //add 
-	 } else {reads_filtered+=weight; }
+	 while(istream >> name)
+	   transNames.push_back(name);
+	 int ret_flag=add_equivalence_class(rList,sample,transNames,weight);
+	 switch(ret_flag){
+         case READS_REDISTRIBUTED : reads_redistributed+=weight; break;
+         case READS_COUNTED : reads_counted+=weight; break;
+         case READS_FILTERED : reads_filtered+=weight; break;
+	 }
      }
-     cout<<reads_counted<< " reads counted, "<<reads_filtered<<" reads filtered."<<endl;
+     cout<<reads_counted<< " reads counted, "
+	 <<reads_filtered<<" reads filtered, "
+	 <<reads_redistributed<<" reads redistributed."
+	 <<endl;
    }
    return rList;
 }
@@ -235,20 +266,12 @@ ReadList * read_salmon_eq_classes_file(string all_file_names, TranscriptList * t
       }
       int weight;
       istream >> weight;
-      //case that the number of reads is smaller than threshold for a link b/n transcripts
-      if(weight<Transcript::min_reads_for_link){
-	//randomly select a transcript to dump the reads to
-	string randName = transNames.at(rand() % transNames.size());
-	vector<string> randTran;
-	randTran.push_back(randName);
-	rList->add_alignment(randTran,sample,weight);
-	reads_redistributed+=weight;
+      int ret_flag=add_equivalence_class(rList,sample,transNames,weight);
+      switch(ret_flag){
+         case READS_REDISTRIBUTED : reads_redistributed+=weight; break;
+         case READS_COUNTED : reads_counted+=weight; break;
+         case READS_FILTERED : reads_filtered+=weight; break;
       }
-      else if(eq_size<=Transcript::max_alignments || Transcript::max_alignments<=0){
-	rList->add_alignment(transNames,sample,weight);
-	reads_counted+=weight;
-      }
-      else { reads_filtered+=weight; }     
     }
     cout<<reads_counted<< " reads counted, "
 	<<reads_filtered<<" reads filtered, "
@@ -334,7 +357,8 @@ void print_usage(){
   cout << endl;
   cout << "\t -l <int>         If running with -i corset or salmon_eq_classes, this will filter out a link between contigs" << endl;
   cout << "\t                  if the link is supported by less than this many reads (performed sample-wise). Reads will " << endl; 
-  cout << "\t                  be randomly reassigned to one of the contigs in the equivalence class." << endl;
+  cout << "\t                  be reassigned uniformly to the contigs in the equivalence class. This option will" << endl;
+  cout << "\t                  improve runtime and memory usage, but will increase the number of clusters reported." << endl;
   cout << "\t                  Default: 1 (no filtering)" << endl;
   cout << endl;
   cout << "\t -x <int>         If running with -i corset or salmon_eq_classes, this option will filter out reads that" << endl;
