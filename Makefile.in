@@ -6,13 +6,13 @@ EX=corset corset_fasta_ID_changer
 all: $(EX) Makefile
 
 corset: $(OBJ)
-	@CXX@ @CXXFLAGS@ $(OBJ) -o $@ @LDFLAGS@ @LIBS@
+	@CXX@ @CXXFLAGS@ $(OBJ) -o $@ @LDFLAGS@ -lpthread @LIBS@
 
 %.o: %.cc
 	@CXX@ @CXXFLAGS@ -c $< -o $@ -DVERSION=$(VERSION)
 
 corset_fasta_ID_changer: corset_fasta_ID_changer.cc
-	g++ $< -o $@
+	@CXX@ $< -o $@
 
 clean:                                                     
 	-rm *~ $(OBJ)
